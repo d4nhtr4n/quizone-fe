@@ -1,0 +1,156 @@
+@import "normalize.css";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700;800;900&display=swap");
+// @import "bootstrap/scss/mixins/breakpoints";
+// @import "src/styles/variables";
+:root {
+    // Dimens
+    --app-horizontal-padding: 28px;
+    --header-height: 66px;
+
+    --text-h1: 4.8rem;
+    --text-h2: 3.906rem;
+    --text-h3: 3.125rem;
+    --text-h4: 2.5rem;
+    --text-h5: 2rem;
+    --text-h6: 1.6rem;
+    --text-h7: 1.28rem;
+    --text-h8: 1rem;
+
+    // @include media-breakpoint-down(md) {
+    //     --text-h1: 3.906rem;
+    //     --text-h2: 3.125rem;
+    //     --text-h3: 2.5rem;
+    //     --text-h4: 2rem;
+    //     --text-h5: 1.6rem;
+    //     --text-h6: 1.28rem;
+    //     --text-h7: 1rem;
+    //     --text-h8: 0.8rem;
+    // }
+
+    // Colors
+    --white-color: #fff;
+    --black-color: #000;
+    --primary-color: #2aeefa;
+    --secondary-color: #6603a0;
+    --bg-color: #0f0f0f;
+    --hover-bg-color: #272727;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --success-color: #28a745;
+
+    --primary-gradient: linear-gradient(84.88deg, #8c04db 0%, #2aeefa 100%);
+
+    --primary-color-0005: rgb(42, 238, 250, 0.05);
+
+    --header-bg-color: #000000;
+    --footer-bg-color: #000000;
+
+    --search-bg-color: #0f0f0f;
+    --search-border-color: #303030;
+    --search-border-hover-color: #626262;
+    --search-color: rgba(255, 255, 255, 0.88);
+
+    --overlay-1st-color: #1e1e1e;
+    --overlay-2nd-color: #222222;
+    --overlay-3rd-color: #242424;
+    --overlay-4th-color: #272727;
+    --overlay-5th-color: #2c2c2c;
+    --overlay-6th-color: #2e2e2e;
+    --overlay-7th-color: #333333;
+    --overlay-8th-color: #353535;
+    --overlay-9th-color: #383838;
+
+    --text-1st-color: #ffffff;
+    --text-2nd-color: #f1f1f1;
+    --text-3rd-color: #aaaaaa;
+    --text-disable-color: #6e7377;
+
+    --scrollbar-color: rgba(200, 200, 200, 0.2);
+    --scrollbar-hover-color: rgba(113, 113, 113, 0.2);
+}
+
+html {
+    font-size: 62.5%;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    color: var(--text-1st-color);
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--bg-color);
+    // Transparent scrollbar on chorimum
+    overflow-y: overlay;
+}
+
+button,
+input,
+[tabindex] {
+    border: none;
+    outline: none;
+}
+
+input,
+textarea,
+select {
+    font-family: inherit;
+}
+
+dl,
+ol,
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-1st-color);
+
+    &:hover {
+        color: var(--text-2nd-color);
+    }
+}
+
+// Simple bar color
+.simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
+    background-color: var(--scrollbar-color);
+}
+
+// Chrome & Safari & New Edge
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color);
+    border-radius: 4px;
+
+    &:hover {
+        background-color: --scrollbar-hover-color;
+    }
+}
+
+// Mozilla FireFox
+@-moz-document url-prefix() {
+    :root {
+        scrollbar-color: var(--scrollbar-color) var(--bg-color);
+        scrollbar-width: thin;
+        scroll-behavior: smooth;
+    }
+}
