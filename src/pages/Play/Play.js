@@ -21,11 +21,10 @@ const socketIo = io(host, {
 export default function Play() {
     const navigate = useNavigate();
     let { pinCode, name } = useParams();
-    const [answer, setAnswer] = useState();
-    const [waitRoom, setWaitRoom] = useState(true);
+    const [myAnswer, setMyAnswer] = useState();
+    const [waitNext, setWaitNext] = useState(false);
     const [showResult, setShowResult] = useState(false);
     const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
-
     const [started, setStarted] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     useEffect(() => {
@@ -78,6 +77,13 @@ export default function Play() {
     }, [pinCode, socketIo]);
     return (
         <div className={cx("wrapper")}>
+            {!started && (
+                <div className={cx("background")}>
+                    <div class={cx("stripe")}>
+                        <div class={cx("stripe_inner")}>WAITING</div>
+                    </div>
+                </div>
+            )}
             {started && showOptions && (
                 <div className={cx("answears")}>
                     <Container>
@@ -85,11 +91,15 @@ export default function Play() {
                             {answears.map((option, index) => (
                                 <Col xs={6}>
                                     <Answear
+                                        disable={myAnswer !== option}
                                         client={true}
                                         key={index}
+                                        selected={myAnswer === option}
                                         value={option}
                                         index={index}
-                                        onClick={(item) => {
+                                        onClick={() => {
+                                            setMyAnswer(option);
+                                            setWaitNext(true);
                                             socketIo.emit("send_answer_req", {
                                                 answer: option,
                                                 pin: pinCode,
@@ -106,6 +116,26 @@ export default function Play() {
                             ))}
                         </Row>
                     </Container>
+                </div>
+            )}
+            {waitNext && (
+                <div
+                    className={cx("modal-container", {
+                        active: true,
+                    })}
+                >
+                    <div className={cx("modal-background")}>
+                        <div className={cx("modal")}>
+                            <div>
+                                <div className={cx("loader")}>
+                                    <span />
+                                    <span />
+                                    <span />
+                                    <span />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

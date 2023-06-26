@@ -20,10 +20,12 @@
     transform: scale(0);
     z-index: 100;
     transition: transform linear 0.05s;
+
     &.active {
         z-index: 0;
         transform: scale(1);
         .modal-background {
+            background-color: rgba($color: #000000, $alpha: 0.25);
             .modal {
                 animation: blowUpModal 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
             }
@@ -41,7 +43,7 @@
         position: relative;
 
         .modal {
-            background: var(--overlay-4th-color);
+            background: var(transparent);
             padding: 50px;
             display: inline-block;
             border-radius: 3px;
@@ -56,6 +58,152 @@
                 font-size: 18px;
                 line-height: 22px;
             }
+        }
+    }
+}
+
+.loader {
+    position: relative;
+}
+
+.loader > span {
+    border: 4px solid transparent;
+    border-top-color: var(--primary-color);
+    border-right-color: var(--primary-color);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.loader > span:nth-child(1) {
+    width: 120px;
+    height: 120px;
+    margin-left: -60px;
+    margin-top: -60px;
+    animation: spin 2s linear infinite;
+}
+
+.loader > span:nth-child(2) {
+    width: 80px;
+    height: 80px;
+    margin-left: -40px;
+    margin-top: -40px;
+    animation: spin 1.75s linear reverse infinite;
+}
+
+.loader > span:nth-child(3) {
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
+    margin-top: -25px;
+    animation: spin 1.5s linear infinite;
+}
+
+.loader > span:nth-child(4) {
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    margin-top: -10px;
+    animation: spin 1.25s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    --stripe-size: 100px;
+    --color1: var(--primary-color);
+    --color2: #313131;
+    --duration: 2s;
+
+    .stripe {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-height: 100vh;
+
+        &_inner {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            font-size: 15vw;
+            font-weight: 900;
+            text-align: center;
+            font-family: "Anton", sans-serif;
+            color: rgba(#fff, 0);
+            background: repeating-linear-gradient(
+                45deg,
+                var(--color1) 25%,
+                var(--color1) 50%,
+                var(--color2) 50%,
+                var(--color2) 75%
+            );
+            background-size: var(--stripe-size) var(--stripe-size);
+            background-clip: text;
+            animation: stripeBackgroundPosition var(--duration) linear infinite;
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% + var(--stripe-size));
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--color2) 25%,
+                var(--color2) 50%,
+                var(--color1) 50%,
+                var(--color1) 75%
+            );
+            background-size: var(--stripe-size) var(--stripe-size);
+            animation: stripeTransform var(--duration) linear infinite;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(#1b2735, 0) 0%, #090a0f 100%);
+        }
+    }
+
+    @keyframes stripeTransform {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(calc(var(--stripe-size) * -1));
+        }
+    }
+
+    @keyframes stripeBackgroundPosition {
+        0% {
+            background-position: 0 0;
+        }
+
+        100% {
+            background-position: calc(var(--stripe-size) * -1) 0;
         }
     }
 }

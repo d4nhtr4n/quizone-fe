@@ -1,35 +1,15 @@
 .container {
     position: relative;
     width: 100%;
-    min-height: 100vh;
+    height: calc(100vh - 74px);
     overflow: hidden;
+    margin-top: -36px;
 
-    .bubbles {
+    .background {
         position: relative;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-
-        span {
-            position: relative;
-            width: 30px;
-            height: 30px;
-            background: #00ffff;
-            top: 0;
-            left: 0;
-            filter: blur(4px);
-            -webkit-filter: blur(4px);
-            margin: 0 4px;
-            border-radius: 50%;
-            box-shadow: 0 0 0 10px rgba(0, 255, 255, 0.44), 0 0 50px #009c9c, 0 0 100px #007a7a;
-            animation: animate 15s linear infinite;
-            animation-duration: calc(125s / var(--i));
-
-            &:nth-child(even) {
-                background: #b100da;
-                box-shadow: 0 0 0 10px rgb(177, 0, 218, 0.44), 0 0 50px #9300b4, 0 0 100px #82009f;
-            }
-        }
     }
 
     .join-form {
@@ -84,5 +64,61 @@
     }
     100% {
         transform: translateY(-100vh) scale(1);
+    }
+}
+
+.red {
+    fill: none;
+    // opacity: 1;
+    stroke: var(--secondary-color);
+    stroke-width: 12;
+    stroke-miterlimit: 10;
+    animation: show 4s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.blue {
+    fill: none;
+    // opacity: 1;
+    stroke: var(--primary-color);
+    stroke-width: 12;
+    stroke-miterlimit: 10;
+    animation: show 4s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.light-blue {
+    fill: none;
+    opacity: 0.5;
+    stroke: var(--primary-color);
+    stroke-width: 6;
+    stroke-miterlimit: 10;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 800;
+    animation: draw 4s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes show {
+    0% {
+        opacity: 0.15;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    100% {
+        opacity: 0.15;
     }
 }

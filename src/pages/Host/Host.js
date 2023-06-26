@@ -68,8 +68,6 @@ export default function Host() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    console.log(waitTime);
-
     useEffect(() => {
         function onConnect() {
             console.log("Connected");
@@ -105,24 +103,57 @@ export default function Host() {
     return (
         <div className={cx("wrapper")}>
             {waitRoom && pinCode && (
-                <div>
-                    <div>{pinCode}</div>
-                    {players.map((player) => {
-                        console.log(player);
-                        return <div>{player}</div>;
-                    })}
-                    <Button
-                        onClick={() => {
-                            setWaitRoom(false);
-                            socketIo.emit("next_question_req", {
-                                counter: currentQuestionCount,
-                                pin: pinCode,
-                            });
-                            socketIo.emit("host_start", { pin: pinCode });
-                        }}
-                    >
-                        Start
-                    </Button>
+                <div className={cx("background")}>
+                    <div class={cx("stripe")}>
+                        <div class={cx("stripe_inner")}>WAITING</div>
+                    </div>
+                </div>
+            )}
+            {waitRoom && pinCode && (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        minHeight: "100vh",
+                    }}
+                >
+                    <div className={cx("wait-room")}>
+                        <div className={cx("pin-code")}>
+                            PIN:&nbsp;
+                            <span>{pinCode}</span>
+                        </div>
+                        {players.length > 0 && (
+                            <Fragment>
+                                <Button
+                                    primary
+                                    onClick={() => {
+                                        setWaitRoom(false);
+                                        socketIo.emit("next_question_req", {
+                                            counter: currentQuestionCount,
+                                            pin: pinCode,
+                                        });
+                                        socketIo.emit("host_start", {
+                                            pin: pinCode,
+                                        });
+                                    }}
+                                >
+                                    Start
+                                </Button>
+                                <div className={cx("line")}> </div>
+                            </Fragment>
+                        )}
+
+                        <div className={cx("players")}>
+                            {players.slice(-30).map((player, index) => {
+                                return (
+                                    <div key={index} className={cx("player")}>
+                                        {player}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
             )}
             {!waitRoom && currentQuestion && (
@@ -133,10 +164,41 @@ export default function Host() {
                     <div className={cx("question-content")}>
                         <p>{currentQuestion.question}</p>
                     </div>
+                    <Row className={cx("images")}>
+                        {waitTime >= 0 && (
+                            <div className={cx("wait-timmer")}>
+                                <div className="timer-wrapper">
+                                    <CountdownCircleTimer
+                                        isPlaying
+                                        duration={waitTime}
+                                        colors={[
+                                            "#004777",
+                                            "#F7B801",
+                                            "#A30000",
+                                            "#A30000",
+                                        ]}
+                                        colorsTime={[10, 6, 3, 0]}
+                                        onComplete={() => {
+                                            setWaitTime(-1);
+                                            socketIo.emit("result_req", {
+                                                pin: pinCode,
+                                                counter: currentQuestionCount,
+                                            });
+                                        }}
+                                    >
+                                        {renderTime}
+                                    </CountdownCircleTimer>
+                                </div>
+                            </div>
+                        )}
+                        <Col lg={5}>
+                            <Image src="https://c4.wallpaperflare.com/wallpaper/88/769/281/1920x1080-px-digital-art-japan-minimalism-simple-background-sun-trees-video-games-star-wars-hd-art-wallpaper-preview.jpg" />
+                        </Col>
+                    </Row>
                 </Container>
             )}
             {preTime >= 0 && (
-                <div className="timer-wrapper">
+                <div className={cx("timer-wrapper")}>
                     <CountdownCircleTimer
                         isPlaying
                         duration={preTime}
@@ -175,33 +237,10 @@ export default function Host() {
                     </Container>
                 </div>
             )}
-            {waitTime >= 0 && (
-                <div className="timer-wrapper">
-                    <CountdownCircleTimer
-                        isPlaying
-                        duration={waitTime}
-                        colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
-                        colorsTime={[10, 6, 3, 0]}
-                        onComplete={() => {
-                            setWaitTime(-1);
-                            socketIo.emit("result_req", {
-                                pin: pinCode,
-                                counter: currentQuestionCount,
-                            });
-                        }}
-                    >
-                        {renderTime}
-                    </CountdownCircleTimer>
-                </div>
-            )}
 
             {/* <Container>
                 
-                <Row className={cx("images")}>
-                    <Col lg={5}>
-                        <Image src="https://c4.wallpaperflare.com/wallpaper/88/769/281/1920x1080-px-digital-art-japan-minimalism-simple-background-sun-trees-video-games-star-wars-hd-art-wallpaper-preview.jpg" />
-                    </Col>
-                </Row>
+                
             </Container> */}
             {/* 
             <div

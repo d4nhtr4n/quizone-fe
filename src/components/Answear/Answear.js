@@ -18,6 +18,7 @@ const answearIcons = [
 ];
 export default function Answear({
     client = false,
+    disable = false,
     value,
     index,
     selected,
@@ -27,6 +28,7 @@ export default function Answear({
         <div
             className={cx("wrapper", {
                 client: client,
+                disabled: disable,
             })}
         >
             <div

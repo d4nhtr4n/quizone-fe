@@ -1,6 +1,10 @@
 @import "bootstrap/scss/mixins/breakpoints";
 @import "src/styles/variables";
 
+.wrapper {
+    min-height: calc(100vh - 71px);
+}
+
 .card {
     margin-bottom: 32px;
 

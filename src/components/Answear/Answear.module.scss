@@ -10,6 +10,11 @@
         padding-bottom: 16px;
     }
 
+    &.disabled {
+        filter: grayscale(0.9);
+        transform: scale(0.95);
+    }
+
     &.client {
         @include media-breakpoint-down(sm) {
             padding-bottom: 32px;
@@ -37,6 +42,10 @@
                 background-color: transparent;
                 border: 2px solid currentColor;
                 transition: all linear 0.15s;
+            }
+
+            &.selected {
+                transform: scale(1.05);
             }
 
             &.selected:after {
