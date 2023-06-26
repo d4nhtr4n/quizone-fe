@@ -1,0 +1,22 @@
+// Responsive
+$mobile-width: 576px;
+$tablet-width: 768px;
+$desktop-width: 1200px;
+
+@mixin Mobile {
+    @media (max-width: #{$mobile-width - 1px}) {
+        @content;
+    }
+}
+
+@mixin Tablet {
+    @media (min-width: #{$mobile-width}) and (max-width: #{$tablet-width - 1px}) {
+        @content;
+    }
+}
+
+@mixin Desktop {
+    @media (min-width: #{$desktop-width}) {
+        @content;
+    }
+}

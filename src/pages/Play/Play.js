@@ -1,0 +1,113 @@
+import classNames from "classnames/bind";
+import style from "./Play.module.scss";
+import Answear from "~/components/Answear/Answear";
+import { useEffect, useRef, useState } from "react";
+import { Col, Container, Row } from "react-bootstrap";
+import Image from "~/components/Image/Image";
+import images from "~/components/assets/images";
+import { useNavigate, useParams } from "react-router-dom";
+import { io } from "socket.io-client";
+import apiConfig from "~/api/usersApi/apiConfig";
+const host = apiConfig.socketUrl;
+
+const cx = classNames.bind(style);
+var delete_cookie = function (name) {
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+};
+const answears = ["A", "B", "C", "D"];
+const socketIo = io(host, {
+    transports: ["websocket"],
+});
+export default function Play() {
+    const navigate = useNavigate();
+    let { pinCode, name } = useParams();
+    const [answer, setAnswer] = useState();
+    const [waitRoom, setWaitRoom] = useState(true);
+    const [showResult, setShowResult] = useState(false);
+    const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
+
+    const [started, setStarted] = useState(false);
+    const [showOptions, setShowOptions] = useState(false);
+    useEffect(() => {
+        function onConnect() {
+            console.log("Connected");
+        }
+
+        function onDisconnect() {
+            console.log("Disconnected");
+        }
+
+        socketIo.on("game_alive", function (data) {
+            if (data === false) {
+                navigate("/join", {
+                    replace: true,
+                });
+            }
+            console.log("game_alive", data);
+        });
+
+        socketIo.on("host_disconnect", function (data) {
+            if (data === pinCode) {
+                navigate("/join", {
+                    replace: true,
+                });
+            }
+            console.log("host_disconnect", data);
+        });
+
+        socketIo.on("next_question_res_player", function (data) {
+            if (data.pin === pinCode) {
+                console.log("new question");
+                setShowOptions(false);
+                setCurrentQuestionCount(data.counter);
+                setTimeout(() => {
+                    setShowOptions(true);
+                }, data.time_prepare * 1000);
+            }
+            console.log(data);
+        });
+
+        socketIo.on("host_start", function (data) {
+            if (data.pin === pinCode) {
+                setStarted(true);
+            }
+        });
+
+        socketIo.on("connect", onConnect);
+        socketIo.on("disconnect", onDisconnect);
+    }, [pinCode, socketIo]);
+    return (
+        <div className={cx("wrapper")}>
+            {started && showOptions && (
+                <div className={cx("answears")}>
+                    <Container>
+                        <Row style={{ height: "calc(100vh - 36px)" }}>
+                            {answears.map((option, index) => (
+                                <Col xs={6}>
+                                    <Answear
+                                        client={true}
+                                        key={index}
+                                        value={option}
+                                        index={index}
+                                        onClick={(item) => {
+                                            socketIo.emit("send_answer_req", {
+                                                answer: option,
+                                                pin: pinCode,
+                                                name: name,
+                                                counter: currentQuestionCount,
+                                            });
+                                            socketIo.emit(
+                                                "game_alive",
+                                                pinCode
+                                            );
+                                        }}
+                                    />
+                                </Col>
+                            ))}
+                        </Row>
+                    </Container>
+                </div>
+            )}
+        </div>
+    );
+}

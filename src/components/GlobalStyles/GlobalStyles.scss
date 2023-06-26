@@ -1,7 +1,7 @@
 @import "normalize.css";
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700;800;900&display=swap");
-// @import "bootstrap/scss/mixins/breakpoints";
-// @import "src/styles/variables";
+@import "bootstrap/scss/mixins/breakpoints";
+@import "src/styles/variables";
 :root {
     // Dimens
     --app-horizontal-padding: 28px;
@@ -16,29 +16,32 @@
     --text-h7: 1.28rem;
     --text-h8: 1rem;
 
-    // @include media-breakpoint-down(md) {
-    //     --text-h1: 3.906rem;
-    //     --text-h2: 3.125rem;
-    //     --text-h3: 2.5rem;
-    //     --text-h4: 2rem;
-    //     --text-h5: 1.6rem;
-    //     --text-h6: 1.28rem;
-    //     --text-h7: 1rem;
-    //     --text-h8: 0.8rem;
-    // }
+    @include media-breakpoint-down(md) {
+        --text-h1: 3.906rem;
+        --text-h2: 3.125rem;
+        --text-h3: 2.5rem;
+        --text-h4: 2rem;
+        --text-h5: 1.6rem;
+        --text-h6: 1.28rem;
+        --text-h7: 1rem;
+        --text-h8: 0.8rem;
+    }
 
     // Colors
     --white-color: #fff;
     --black-color: #000;
-    --primary-color: #2aeefa;
-    --secondary-color: #6603a0;
+    --primary-color: #00ffff;
+    --primary-color-rgb: 0, 255, 255;
+    --secondary-color: #b100da;
     --bg-color: #0f0f0f;
     --hover-bg-color: #272727;
     --danger-color: #dc3545;
     --warning-color: #ffc107;
     --success-color: #28a745;
 
-    --primary-gradient: linear-gradient(84.88deg, #8c04db 0%, #2aeefa 100%);
+    --primary-gradient: linear-gradient(84.88deg, #b100da 0%, #00ffff 100%);
+
+    --primary-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 
     --primary-color-0005: rgb(42, 238, 250, 0.05);
 

@@ -1,0 +1,110 @@
+@import "bootstrap/scss/mixins/breakpoints";
+@import "src/styles/variables";
+
+$gradient: linear-gradient(90deg, #B100DA 0%, #00FFFF 50%, #B100DA 100%);
+
+.wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: var(--text-h6);
+    font-weight: 700;
+    font-family: var(--font-family);
+    color: var(--text-1st-color);
+    cursor: pointer;
+    background-color: transparent;
+    user-select: none;
+    border: 1px solid transparent;
+
+    @include media-breakpoint-down(sm) {
+        min-width: 70px;
+        padding: 4px 8px;
+    }
+
+    + .wrapper {
+        margin-left: 8px;
+    }
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
+
+.icon + .title,
+.title + .icon {
+    margin-left: 8px;
+}
+
+.icon {
+    display: inline-block;
+    width: 24px;
+    text-align: left;
+    @include media-breakpoint-down(sm) {
+        width: 12px;
+    }
+}
+
+.primary {
+    color: var(--white);
+    background: $gradient;
+    background-size: 300% 100%;
+
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out;
+
+    &:hover {
+        background-position: 100% 0;
+        -moz-transition: all 0.25s ease-in-out;
+        -o-transition: all 0.25s ease-in-out;
+        -webkit-transition: all 0.25s ease-in-out;
+        transition: all 0.25s ease-in-out;
+    }
+}
+
+.outline {
+    background-color: transparent;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+
+    &:hover {
+        color: var(--primary-color);
+        background-color: var(--primary-color-0005);
+    }
+}
+
+.text {
+    &:hover {
+        opacity: 1;
+    }
+}
+
+// Button sizes
+.small {
+    font-size: var(--text-h7);
+    font-weight: 500;
+    min-width: 88px;
+    padding: 4px 16px;
+    width: 16px;
+
+    @include media-breakpoint-down(md) {
+        min-width: 66px;
+        padding: 4px 8px;
+    }
+}
+
+.large {
+    font-size: var(--text-h5);
+    padding: 10px 16px;
+    min-width: 140px;
+
+    @include media-breakpoint-down(sm) {
+        min-width: 90px;
+        padding: 6px 10px;
+    }
+}

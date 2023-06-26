@@ -1,0 +1,7 @@
+.tab-panel {
+    // make tab change smooth because tab will be unmout on exit
+    // different height make footer dont fixed when change tab
+    min-height: calc(100vh - var(--header-height));
+
+    padding-top: 12px;
+}

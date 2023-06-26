@@ -1,0 +1,25 @@
+.title {
+    font-size: var(--text-h5);
+    text-transform: uppercase;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    text-transform: capitalize;
+    font-size: var(--text-h6);
+    font-weight: 400;
+
+    a {
+        color: var(--text-1st-color);
+
+        &:hover {
+            color: var(--primary-color);
+        }
+    }
+
+    .item + .item {
+        margin-top: 8px;
+    }
+}

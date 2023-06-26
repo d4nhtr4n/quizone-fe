@@ -1,0 +1,7 @@
+@import "bootstrap/scss/mixins/breakpoints";
+@import "src/styles/variables";
+
+.wrapper {
+    width: 100%;
+    min-height: 100vh;
+}

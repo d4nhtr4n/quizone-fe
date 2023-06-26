@@ -1,0 +1,11 @@
+@import "bootstrap/scss/mixins/breakpoints";
+@import "src/styles/variables";
+
+.content {
+    margin-top: 74px;
+    padding-top: 36px;
+
+    @include media-breakpoint-down(sm) {
+        padding-top: 15px;
+    }
+}

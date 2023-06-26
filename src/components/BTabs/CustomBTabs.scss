@@ -1,0 +1,50 @@
+@import "bootstrap/scss/mixins/breakpoints";
+@import "src/styles/variables";
+
+.btab-custom {
+    display: block;
+    width: 100%;
+
+    .nav {
+        @include media-breakpoint-down(sm) {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .nav-link {
+        font-size: var(--text-h6);
+        font-weight: 700;
+        color: var(--text-1st-color);
+        border-radius: 0;
+        background-color: transparent;
+        border-bottom: 4px solid;
+        border-color: transparent;
+        position: relative;
+        padding: 6px 16px;
+
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 4px;
+            transform: skew(-40deg);
+            background: var(--primary-gradient);
+
+            transition: all 0.1s ease;
+        }
+
+        &.active {
+            background-color: transparent;
+            background: var(--primary-gradient);
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            &::after {
+                width: 100%;
+            }
+        }
+    }
+}

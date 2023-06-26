@@ -1,0 +1,34 @@
+@import "bootstrap/scss/mixins/breakpoints";
+@import "src/styles/variables";
+
+#header-nav {
+    .navbar-brand {
+        margin-right: 24px;
+    }
+    .nav-item {
+        @include media-breakpoint-down(lg) {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .nav-link {
+            font-weight: 600;
+            color: var(--text-2nd-color);
+            @include media-breakpoint-up(lg) {
+                padding-left: 2rem;
+                padding-left: 2rem;
+            }
+
+            &:hover {
+                color: var(--text-1st-color);
+            }
+            &.active a {
+                -webkit-text-fill-color: transparent;
+                background-color: transparent;
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                background-clip: text;
+                font-weight: 900;
+            }
+        }
+    }
+}
