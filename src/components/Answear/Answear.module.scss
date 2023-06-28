@@ -11,8 +11,7 @@
     }
 
     &.disabled {
-        filter: grayscale(0.9);
-        transform: scale(0.95);
+        opacity: 0.3;
     }
 
     &.client {

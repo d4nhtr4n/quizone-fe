@@ -9,7 +9,6 @@ import { useCookie } from "~/hooks";
 import usersApi from "~/api/usersApi/usersApi";
 import { userConst } from "~/api/constant";
 const cx = classNames.bind(style);
-
 const temp = ["a", "a", "a", "a", "a", "a", "a", "a", "a"];
 var delete_cookie = function (name) {
     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
@@ -48,7 +47,7 @@ export default function MyQuizz() {
                                 >
                                     <Card.Img
                                         variant="top"
-                                        src="https://imglarger.com/Images/before-after/ai-image-enlarger-1-after-2.jpg"
+                                        src="https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510_1280.jpg"
                                         className={cx("card-img")}
                                     />
                                     <Card.Body>

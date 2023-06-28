@@ -13,9 +13,57 @@ import usersApi from "~/api/usersApi/usersApi";
 import { userConst } from "~/api/constant";
 import Button from "~/components/Button/Button";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+import { faCircleXmark, faSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+ChartJS.defaults.font.family = "'FontAwesome',san-sefif'";
+
+const chartColors = ["#E21B3C", "#D89E00", "#26890C", "#1368CE"];
+const timerColors = ["#1368CE", "#26890C", "#D89E00", "#E21B3C"];
+
+const chartOptions = {
+    scales: {
+        x: {
+            grid: {
+                display: false,
+            },
+        },
+        y: {
+            grid: {
+                display: false,
+            },
+        },
+    },
+
+    responsive: true,
+    plugins: {
+        legend: {
+            display: false,
+        },
+    },
+};
 
 const host = apiConfig.socketUrl;
-
+const answerTemplate = ["A", "B", "C", "D"];
 const cx = classNames.bind(style);
 var delete_cookie = function (name) {
     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
@@ -23,32 +71,46 @@ var delete_cookie = function (name) {
 
 const renderTime = ({ remainingTime }) => {
     if (remainingTime === 0) {
-        return <div className="timer">Too lale...</div>;
+        return <div className={cx("timer")}>Too lale...</div>;
     }
 
     return (
-        <div className="timer">
-            <div className="text">Remaining</div>
-            <div className="value">{remainingTime}</div>
-            <div className="text">seconds</div>
+        <div className={cx("timer")}>
+            <div className={cx("text")}>Remaining</div>
+            <div className={cx("value")}>{remainingTime}</div>
+            <div className={cx("text")}>seconds</div>
         </div>
     );
 };
 const socketIo = io(host, {
     transports: ["websocket"],
 });
+
 export default function Host() {
-    const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([
+        "AAAAAA",
+        "AAAAAA",
+        "AAAAAA",
+        "AAAAAA",
+        "AAAAAA",
+        "AAAAAA",
+        "AAAAAA",
+        "AAAAAA",
+        "AAAAAA",
+    ]);
     const accessToken = useCookie("access_token");
     let { id } = useParams();
-
+    const [chartData, setChartData] = useState();
     const [currentQuestion, setCurrentQuestion] = useState();
+    const [showResult, setShowResult] = useState(false);
     const [waitRoom, setWaitRoom] = useState(true);
     const [pinCode, setPinCode] = useState();
     const [preTime, setPretime] = useState(-1);
     const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
     const [waitTime, setWaitTime] = useState(-1);
     const [showOptions, setShowOptions] = useState(false);
+    const [trueIndex, setTrueIndex] = useState(-1);
+    const [showFinal, setShowFinal] = useState(false);
 
     useEffect(() => {
         (async function handleGetList() {
@@ -83,12 +145,38 @@ export default function Host() {
         });
         socketIo.on("next_question_res", function (data) {
             console.log(data);
-            setCurrentQuestion(data.question);
-            setPretime(data.question.time_prepare);
+            if (data !== "End") {
+                setCurrentQuestion(data.question);
+                setTrueIndex(answerTemplate.indexOf(data.question.answer));
+                setPretime(data.question.time_prepare);
+            } else {
+                setShowFinal(true);
+            }
         });
         socketIo.on("result_res", function (data) {
             if (data) {
                 if (data.pin === pinCode) {
+                    setChartData({
+                        labels: ["", "", "", ""],
+                        datasets: [
+                            {
+                                data: [
+                                    data.counterA + 1,
+                                    data.counterB + 1,
+                                    data.counterC + 1,
+                                    data.counterD + 1,
+                                ],
+                                borderRadius: 1,
+                                backgroundColor: chartColors.map(
+                                    (color, index) =>
+                                        index ===
+                                        answerTemplate.indexOf(data.answer)
+                                            ? color
+                                            : `${color}59`
+                                ),
+                            },
+                        ],
+                    });
                 }
                 console.log(data);
             }
@@ -171,15 +259,11 @@ export default function Host() {
                                     <CountdownCircleTimer
                                         isPlaying
                                         duration={waitTime}
-                                        colors={[
-                                            "#004777",
-                                            "#F7B801",
-                                            "#A30000",
-                                            "#A30000",
-                                        ]}
+                                        colors={timerColors}
                                         colorsTime={[10, 6, 3, 0]}
                                         onComplete={() => {
                                             setWaitTime(-1);
+                                            setShowResult(true);
                                             socketIo.emit("result_req", {
                                                 pin: pinCode,
                                                 counter: currentQuestionCount,
@@ -191,9 +275,45 @@ export default function Host() {
                                 </div>
                             </div>
                         )}
-                        <Col lg={5}>
-                            <Image src="https://c4.wallpaperflare.com/wallpaper/88/769/281/1920x1080-px-digital-art-japan-minimalism-simple-background-sun-trees-video-games-star-wars-hd-art-wallpaper-preview.jpg" />
+                        <Col lg={6}>
+                            {!showResult ? (
+                                <Image src="https://c4.wallpaperflare.com/wallpaper/88/769/281/1920x1080-px-digital-art-japan-minimalism-simple-background-sun-trees-video-games-star-wars-hd-art-wallpaper-preview.jpg" />
+                            ) : (
+                                <div>
+                                    {chartData && (
+                                        <Bar
+                                            options={chartOptions}
+                                            data={chartData}
+                                        />
+                                    )}
+                                </div>
+                            )}
                         </Col>
+
+                        {showResult && (
+                            <div className={cx("next-button")}>
+                                <Col>
+                                    <Button
+                                        primary
+                                        onClick={() => {
+                                            socketIo.emit("next_question_req", {
+                                                counter:
+                                                    currentQuestionCount + 1,
+                                                pin: pinCode,
+                                            });
+                                            setCurrentQuestionCount(
+                                                currentQuestionCount + 1
+                                            );
+                                            setShowResult(false);
+                                            setShowOptions(false);
+                                            setChartData("");
+                                        }}
+                                    >
+                                        Next
+                                    </Button>
+                                </Col>
+                            </div>
+                        )}
                     </Row>
                 </Container>
             )}
@@ -202,7 +322,7 @@ export default function Host() {
                     <CountdownCircleTimer
                         isPlaying
                         duration={preTime}
-                        colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
+                        colors={["#00ffff", "#00ffff", "#b100da", "#b100da"]}
                         colorsTime={[10, 6, 3, 0]}
                         onComplete={() => {
                             setPretime(-1);
@@ -214,7 +334,7 @@ export default function Host() {
                     </CountdownCircleTimer>
                 </div>
             )}
-            {showOptions && waitTime >= 0 && (
+            {((showOptions && waitTime >= 0) || showResult) && (
                 <div className={cx("answears")}>
                     <Container>
                         <Row>
@@ -223,9 +343,16 @@ export default function Host() {
                                 currentQuestion.answerB,
                                 currentQuestion.answerC,
                                 currentQuestion.answerD,
-                            ].map((option, index) => (
+                            ].map((option, index, array) => (
                                 <Col lg={6} key={index}>
                                     <Answear
+                                        disable={
+                                            showResult &&
+                                            index !==
+                                                answerTemplate.indexOf(
+                                                    currentQuestion.answer
+                                                )
+                                        }
                                         key={index}
                                         value={option}
                                         index={index}
@@ -237,37 +364,56 @@ export default function Host() {
                     </Container>
                 </div>
             )}
-
-            {/* <Container>
-                
-                
-            </Container> */}
-            {/* 
-            <div
-                className={cx("modal-container", {
-                    active: showResult,
-                })}
-            >
-                <div className={cx("modal-background")}>
-                    <div className={cx("area")}>
-                        <ul className={cx("circles")}>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                        </ul>
-                    </div>
-                    <div className={cx("modal")}>
-                        <p>Correct</p>
+            {showFinal && (
+                <div
+                    className={cx("modal-container", {
+                        active: showFinal,
+                    })}
+                >
+                    <div className={cx("modal-background")}>
+                        <div className={cx("area")}>
+                            <ul className={cx("circles")}>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+                        <div className={cx("modal")}>
+                            <Button
+                                className={cx("close-btn")}
+                                rightIcon={
+                                    <FontAwesomeIcon icon={faCircleXmark} />
+                                }
+                                to={"/"}
+                            />
+                            <div className={cx("congrats")}>
+                                <h1>Congratulations!</h1>
+                            </div>
+                            <div className={cx("podium-list")}>
+                                <div className={cx("podium", "podium-2nd")}>
+                                    <Image src={images.podium2nd}></Image>
+                                    <span>Name</span>
+                                </div>
+                                <div className={cx("podium", "podium-1st")}>
+                                    <Image src={images.podium1st}></Image>
+                                    <span>Name</span>
+                                </div>
+                                <div className={cx("podium", "podium-3rd")}>
+                                    <Image src={images.podium3rd}></Image>
+                                    <span>Name</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div> */}
+            )}
         </div>
     );
 }

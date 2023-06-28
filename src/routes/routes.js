@@ -10,6 +10,7 @@ import Play from "~/pages/Play/Play";
 import FullScreenLayout from "~/layouts/FullScreenLayout/FullScreenLayout";
 import MyQuizz from "~/pages/MyQuizz/MyQuizz";
 import Host from "~/pages/Host/Host";
+import NoFooterLayout from "~/layouts/NoFooterLayout/NoFooterLayout";
 
 const publicRoutes = [
     { path: configs.routes.default, component: Home },
@@ -37,6 +38,7 @@ const publicRoutes = [
     {
         path: configs.routes.join,
         component: Join,
+        layout: NoFooterLayout,
     },
     {
         path: configs.routes.play,

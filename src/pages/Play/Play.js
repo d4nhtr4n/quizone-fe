@@ -42,7 +42,6 @@ export default function Play() {
                     replace: true,
                 });
             }
-            console.log("game_alive", data);
         });
 
         socketIo.on("host_disconnect", function (data) {
@@ -58,11 +57,22 @@ export default function Play() {
             if (data.pin === pinCode) {
                 console.log("new question");
                 setShowOptions(false);
+                setMyAnswer("");
                 setCurrentQuestionCount(data.counter);
                 setTimeout(() => {
                     setShowOptions(true);
+                    setWaitNext(false);
                 }, data.time_prepare * 1000);
+                setWaitNext(true);
             }
+            console.log(data);
+        });
+
+        socketIo.on("send_answer_res", function (data) {
+            console.log(data);
+        });
+
+        socketIo.on("result_res_player", function (data) {
             console.log(data);
         });
 
@@ -79,9 +89,7 @@ export default function Play() {
         <div className={cx("wrapper")}>
             {!started && (
                 <div className={cx("background")}>
-                    <div class={cx("stripe")}>
-                        <div class={cx("stripe_inner")}>WAITING</div>
-                    </div>
+                    <div class={cx("stripe_inner")}>WAITING</div>
                 </div>
             )}
             {started && showOptions && (
@@ -91,7 +99,9 @@ export default function Play() {
                             {answears.map((option, index) => (
                                 <Col xs={6}>
                                     <Answear
-                                        disable={myAnswer !== option}
+                                        disable={
+                                            myAnswer && myAnswer !== option
+                                        }
                                         client={true}
                                         key={index}
                                         selected={myAnswer === option}
