@@ -84,6 +84,7 @@ export default function Play() {
                 setShowMyResult(true);
             } else {
                 if (!myResult) {
+                    console("fake");
                     setMyResult({
                         result: false,
                         point: 0,
