@@ -362,3 +362,31 @@
         border-radius: 50%;
     }
 }
+
+.result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result-image {
+    width: 100%;
+    max-width: 320px;
+}
+
+.result-point {
+    font-size: var(--text-h1);
+    font-weight: 900;
+    -webkit-text-fill-color: transparent;
+    background-color: transparent;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    display: inline-block;
+}
+
+.result-status {
+    font-size: var(--text-h2);
+    font-weight: 600;
+    display: inline-block;
+}

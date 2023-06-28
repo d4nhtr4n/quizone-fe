@@ -131,6 +131,13 @@ export default function Host() {
     }, []);
 
     useEffect(() => {
+        if (showFinal) {
+            socketIo.emit("final_result_req", { pin: pinCode });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showFinal]);
+
+    useEffect(() => {
         function onConnect() {
             console.log("Connected");
         }
@@ -155,16 +162,17 @@ export default function Host() {
         });
         socketIo.on("result_res", function (data) {
             if (data) {
+                console.log(data);
                 if (data.pin === pinCode) {
                     setChartData({
                         labels: ["", "", "", ""],
                         datasets: [
                             {
                                 data: [
-                                    data.counterA + 1,
-                                    data.counterB + 1,
-                                    data.counterC + 1,
-                                    data.counterD + 1,
+                                    data.counterA,
+                                    data.counterB,
+                                    data.counterC,
+                                    data.counterD,
                                 ],
                                 borderRadius: 1,
                                 backgroundColor: chartColors.map(
@@ -181,7 +189,9 @@ export default function Host() {
                 console.log(data);
             }
         });
-
+        socketIo.on("final_result_res", (data) => {
+            console.log(data);
+        });
         socketIo.on("connect", onConnect);
         socketIo.on("disconnect", onDisconnect);
     }, [pinCode, socketIo]);

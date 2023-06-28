@@ -11,6 +11,8 @@ const images = {
     podium1st: require("./podium-1st.svg").default,
     podium2nd: require("./podium-2nd.svg").default,
     podium3rd: require("./podium-3rd.svg").default,
+    correct: require("./correct.png"),
+    incorrect: require("./incorrect.png"),
 };
 
 export default images;

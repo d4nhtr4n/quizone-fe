@@ -23,8 +23,9 @@ export default function Play() {
     let { pinCode, name } = useParams();
     const [myAnswer, setMyAnswer] = useState();
     const [waitNext, setWaitNext] = useState(false);
-    const [showResult, setShowResult] = useState(false);
-    const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
+    const [showMyResult, setShowMyResult] = useState(false);
+    const [myResult, setMyResult] = useState("");
+    const [currentQuestionCount, setCurrentQuestionCount] = useState(-1);
     const [started, setStarted] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     useEffect(() => {
@@ -55,7 +56,7 @@ export default function Play() {
 
         socketIo.on("next_question_res_player", function (data) {
             if (data.pin === pinCode) {
-                console.log("new question");
+                console.log("new question", data);
                 setShowOptions(false);
                 setMyAnswer("");
                 setCurrentQuestionCount(data.counter);
@@ -64,16 +65,31 @@ export default function Play() {
                     setWaitNext(false);
                 }, data.time_prepare * 1000);
                 setWaitNext(true);
+                setShowMyResult(false);
+                setMyResult();
             }
             console.log(data);
         });
 
         socketIo.on("send_answer_res", function (data) {
-            console.log(data);
+            console.log("send_answer_res", data);
+            if (data) {
+                setMyResult(data);
+            }
         });
 
         socketIo.on("result_res_player", function (data) {
-            console.log(data);
+            console.log("result_res_player", data);
+            if (data) {
+                setShowMyResult(true);
+            } else {
+                if (!myResult) {
+                    setMyResult({
+                        result: false,
+                        point: 0,
+                    });
+                }
+            }
         });
 
         socketIo.on("host_start", function (data) {
@@ -85,6 +101,7 @@ export default function Play() {
         socketIo.on("connect", onConnect);
         socketIo.on("disconnect", onDisconnect);
     }, [pinCode, socketIo]);
+
     return (
         <div className={cx("wrapper")}>
             {!started && (
@@ -110,6 +127,7 @@ export default function Play() {
                                         onClick={() => {
                                             setMyAnswer(option);
                                             setWaitNext(true);
+                                            console.log(currentQuestionCount);
                                             socketIo.emit("send_answer_req", {
                                                 answer: option,
                                                 pin: pinCode,
@@ -134,18 +152,43 @@ export default function Play() {
                         active: true,
                     })}
                 >
-                    <div className={cx("modal-background")}>
-                        <div className={cx("modal")}>
-                            <div>
-                                <div className={cx("loader")}>
-                                    <span />
-                                    <span />
-                                    <span />
-                                    <span />
+                    {showMyResult ? (
+                        <div className={cx("modal-background")}>
+                            <div className={cx("modal")}>
+                                <div className={cx("result")}>
+                                    <Image
+                                        className={cx("result-image")}
+                                        src={
+                                            myResult
+                                                ? images.correct
+                                                : images.incorrect
+                                        }
+                                    />
+                                    <h1 className={cx("result-status")}>
+                                        {myResult.result
+                                            ? "Correct"
+                                            : "Incorrect"}
+                                    </h1>
+                                    <h1
+                                        className={cx("result-point")}
+                                    >{`+${myResult.point}`}</h1>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className={cx("modal-background")}>
+                            <div className={cx("modal")}>
+                                <div>
+                                    <div className={cx("loader")}>
+                                        <span />
+                                        <span />
+                                        <span />
+                                        <span />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
