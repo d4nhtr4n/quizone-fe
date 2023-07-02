@@ -16,6 +16,7 @@ var delete_cookie = function (name) {
 export default function MyQuizz() {
     const [quizzList, setQuizzList] = useState();
     const accessToken = useCookie("access_token");
+
     useEffect(() => {
         (async function handleGetList() {
             try {
@@ -35,6 +36,9 @@ export default function MyQuizz() {
     }, [accessToken]);
     return (
         <div className={cx("wrapper")} id="quizz-list">
+            <Button primary to={"/create"}>
+                Create New
+            </Button>
             <Container>
                 <Row>
                     {quizzList &&

@@ -11,6 +11,7 @@ import FullScreenLayout from "~/layouts/FullScreenLayout/FullScreenLayout";
 import MyQuizz from "~/pages/MyQuizz/MyQuizz";
 import Host from "~/pages/Host/Host";
 import NoFooterLayout from "~/layouts/NoFooterLayout/NoFooterLayout";
+import Create from "~/pages/Create/Create";
 
 const publicRoutes = [
     { path: configs.routes.default, component: Home },
@@ -52,6 +53,11 @@ const publicRoutes = [
     {
         path: configs.routes.host,
         component: Host,
+        layout: FullScreenLayout,
+    },
+    {
+        path: configs.routes.create,
+        component: Create,
         layout: FullScreenLayout,
     },
 ];

@@ -28,6 +28,10 @@ const usersApi = {
         const url = `/host?quizId=${id}`;
         return axiosClient(token).get(url, {});
     },
+    createNewQuiz: (token, data) => {
+        const url = `/quiz/save`;
+        return axiosClient(token).post(url, { data });
+    },
     // forgotPassword: (email) => {
     //     const url = `/api/auth/forgotpassword`;
     //     return axiosClient().post(url, {
