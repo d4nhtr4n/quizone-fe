@@ -47,7 +47,9 @@ import usersApi from "~/api/usersApi/usersApi";
 import { userConst } from "~/api/constant";
 
 const cx = classNames.bind(style);
-
+var delete_cookie = function (name) {
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+};
 const defaultThumbnail =
     "https://assets-cdn.kahoot.it/builder/v2/assets/placeholder-cover-kahoot-dca23b0a.png";
 
@@ -92,7 +94,9 @@ const Create = () => {
         uid: uuidv4(),
         title: "",
         description: "",
-        thumbnailUri: defaultThumbnail || null,
+        thumbnailUri: {
+            imgSrc: defaultThumbnail || null,
+        },
         theme: "",
     });
 
@@ -568,7 +572,7 @@ const Create = () => {
                 try {
                     const url = await uploadFile(
                         selectedThumbnail,
-                        () => console.log("Đang upload thumbnail"),
+                        () => console.log("Uploading thumbnail"),
                         () => {
                             // Set progress here
                         }
@@ -596,7 +600,7 @@ const Create = () => {
                     try {
                         const url = await uploadFile(
                             question.imageUri.file,
-                            () => console.log("Đang upload image"),
+                            () => console.log("Uploading image"),
                             () => {
                                 // Set progress here
                             }
@@ -618,7 +622,6 @@ const Create = () => {
             setQuestionsList(updatedQuestionsList);
             setSelectedThumbnail(null);
             setIsDone(true);
-            toast.success("Quiz created successfully!");
         }
 
         setIsLoading(false);
@@ -650,14 +653,22 @@ const Create = () => {
                     console.log("Create new quizz", result);
                     if (result.status === "success") {
                         console.log(response.data);
+                        toast.success("Quiz created successfully!");
+                        setTimeout(() => {
+                            navigate("/myquiz");
+                        }, 1000);
                     } else {
                         if (result.error === userConst.authenticationFailed) {
-                            // delete_cookie("access_token");
+                            delete_cookie("access_token");
+                            toast.error(
+                                "Authentication Failed! Please login again."
+                            );
+
+                            navigate("/login");
                         }
                     }
                 } catch (error) {}
             })();
-            // navigate('/myquiz')
         }
     }, [isDone]);
 

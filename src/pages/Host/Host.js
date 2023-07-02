@@ -87,17 +87,7 @@ const socketIo = io(host, {
 });
 
 export default function Host() {
-    const [players, setPlayers] = useState([
-        "AAAAAA",
-        "AAAAAA",
-        "AAAAAA",
-        "AAAAAA",
-        "AAAAAA",
-        "AAAAAA",
-        "AAAAAA",
-        "AAAAAA",
-        "AAAAAA",
-    ]);
+    const [players, setPlayers] = useState([]);
     const accessToken = useCookie("access_token");
     let { id } = useParams();
     const [chartData, setChartData] = useState();
@@ -111,6 +101,7 @@ export default function Host() {
     const [showOptions, setShowOptions] = useState(false);
     const [trueIndex, setTrueIndex] = useState(-1);
     const [showFinal, setShowFinal] = useState(false);
+    const [finalResults, setFinalResults] = useState([]);
 
     useEffect(() => {
         (async function handleGetList() {
@@ -190,7 +181,10 @@ export default function Host() {
             }
         });
         socketIo.on("final_result_res", (data) => {
-            console.log(data);
+            if (data) {
+                console.log(data.result);
+                setFinalResults(data.result);
+            }
         });
         socketIo.on("connect", onConnect);
         socketIo.on("disconnect", onDisconnect);
@@ -287,7 +281,7 @@ export default function Host() {
                         )}
                         <Col lg={6}>
                             {!showResult ? (
-                                <Image src="https://c4.wallpaperflare.com/wallpaper/88/769/281/1920x1080-px-digital-art-japan-minimalism-simple-background-sun-trees-video-games-star-wars-hd-art-wallpaper-preview.jpg" />
+                                <Image src={currentQuestion.image_uri} />
                             ) : (
                                 <div>
                                     {chartData && (
@@ -406,20 +400,28 @@ export default function Host() {
                             <div className={cx("congrats")}>
                                 <h1>Congratulations!</h1>
                             </div>
-                            <div className={cx("podium-list")}>
-                                <div className={cx("podium", "podium-2nd")}>
-                                    <Image src={images.podium2nd}></Image>
-                                    <span>Name</span>
+                            {finalResults && (
+                                <div className={cx("podium-list")}>
+                                    <div className={cx("podium", "podium-2nd")}>
+                                        <Image src={images.podium2nd}></Image>
+                                        {finalResults[1] && (
+                                            <span>{finalResults[1].name}</span>
+                                        )}
+                                    </div>
+                                    <div className={cx("podium", "podium-1st")}>
+                                        <Image src={images.podium1st}></Image>
+                                        {finalResults[0] && (
+                                            <span>{finalResults[0].name}</span>
+                                        )}
+                                    </div>
+                                    <div className={cx("podium", "podium-3rd")}>
+                                        <Image src={images.podium3rd}></Image>
+                                        {finalResults[2] && (
+                                            <span>{finalResults[2].name}</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className={cx("podium", "podium-1st")}>
-                                    <Image src={images.podium1st}></Image>
-                                    <span>Name</span>
-                                </div>
-                                <div className={cx("podium", "podium-3rd")}>
-                                    <Image src={images.podium3rd}></Image>
-                                    <span>Name</span>
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>

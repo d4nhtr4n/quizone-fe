@@ -26,18 +26,20 @@ const Quiz = ({
 }) => {
     const seconds = () => {
         switch (question.timeLimit) {
-            case "5s":
+            case "5":
                 return "05";
-            case "10s":
+            case "10":
                 return "10";
-            case "20s":
+            case "20":
                 return "20";
-            case "30s":
+            case "30":
                 return "30";
-            case "1m":
+            case "60":
                 return "60";
-            case "1m30":
+            case "90":
                 return "90";
+            default:
+                return 0;
         }
     };
 

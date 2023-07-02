@@ -160,7 +160,7 @@ export default function Play() {
                                     <Image
                                         className={cx("result-image")}
                                         src={
-                                            myResult
+                                            myResult.result
                                                 ? images.correct
                                                 : images.incorrect
                                         }

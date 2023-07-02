@@ -32,6 +32,10 @@ const usersApi = {
         const url = `/quiz/save`;
         return axiosClient(token).post(url, { data });
     },
+    deleteQuiz: (token, id) => {
+        const url = `/quiz/delete?id=${id}`;
+        return axiosClient(token).post(url, {});
+    },
     // forgotPassword: (email) => {
     //     const url = `/api/auth/forgotpassword`;
     //     return axiosClient().post(url, {

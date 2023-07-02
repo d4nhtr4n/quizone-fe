@@ -105,7 +105,7 @@ export default function Header() {
                                     active={pathname === routes.myQuizz}
                                 >
                                     <NavLink to={routes.myQuizz}>
-                                        My Quizz
+                                        My Quiz
                                     </NavLink>
                                 </MDBNavbarLink>
                             </MDBNavbarItem>

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useCookie } from "~/hooks";
 import usersApi from "~/api/usersApi/usersApi";
 import { userConst } from "~/api/constant";
+import { toast } from "react-hot-toast";
 const cx = classNames.bind(style);
 const temp = ["a", "a", "a", "a", "a", "a", "a", "a", "a"];
 var delete_cookie = function (name) {
@@ -51,7 +52,7 @@ export default function MyQuizz() {
                                 >
                                     <Card.Img
                                         variant="top"
-                                        src="https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510_1280.jpg"
+                                        src={item.thumbnail_uri}
                                         className={cx("card-img")}
                                     />
                                     <Card.Body>
@@ -90,7 +91,50 @@ export default function MyQuizz() {
                                                         Share
                                                     </Dropdown.Item>
                                                     <Dropdown.Divider />
-                                                    <Dropdown.Item href="#/action-3">
+                                                    <Dropdown.Item
+                                                        onClick={() => {
+                                                            (async function handleDeleteQuiz() {
+                                                                try {
+                                                                    const response =
+                                                                        await usersApi.deleteQuiz(
+                                                                            accessToken,
+                                                                            item._id
+                                                                        );
+                                                                    let result =
+                                                                        response;
+                                                                    console.log(
+                                                                        "Delete",
+                                                                        result
+                                                                    );
+                                                                    if (
+                                                                        result.status ===
+                                                                        "success"
+                                                                    ) {
+                                                                        console.log(
+                                                                            response.data
+                                                                        );
+                                                                        toast.success(
+                                                                            "Delete Successfully"
+                                                                        );
+                                                                        // setQuizzList(
+                                                                        //     response
+                                                                        //         .data
+                                                                        //         .quizzes
+                                                                        // );
+                                                                    } else {
+                                                                        if (
+                                                                            result.error ===
+                                                                            userConst.authenticationFailed
+                                                                        ) {
+                                                                            delete_cookie(
+                                                                                "access_token"
+                                                                            );
+                                                                        }
+                                                                    }
+                                                                } catch (error) {}
+                                                            })();
+                                                        }}
+                                                    >
                                                         Delete
                                                     </Dropdown.Item>
                                                 </Dropdown.Menu>
