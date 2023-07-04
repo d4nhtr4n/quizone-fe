@@ -60,6 +60,11 @@ const publicRoutes = [
         component: Create,
         layout: FullScreenLayout,
     },
+    {
+        path: configs.routes.edit,
+        component: Create,
+        layout: FullScreenLayout,
+    },
 ];
 
 const privateRoutes = [];

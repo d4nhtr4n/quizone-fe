@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { io } from "socket.io-client";
 import apiConfig from "~/api/usersApi/apiConfig";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 const host = apiConfig.baseUrl;
 const cx = classNames.bind(style);
 export default function Join() {
@@ -26,6 +27,7 @@ export default function Join() {
         socketIo.on("player_join_res", function (data) {
             if (data.error) {
                 console.log(data.error);
+                toast.error(data.error);
             } else {
                 console.log(data);
                 navigate(`/play/${data.pin}/${data.name}`, {

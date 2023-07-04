@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import {
     unstable_useBlocker as useBlocker,
     useNavigate,
+    useParams,
 } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import classNames from "classnames/bind";
@@ -16,6 +17,7 @@ import {
     MDBModalBody,
     MDBModalFooter,
 } from "mdb-react-ui-kit";
+import "./Create.scss";
 import Select from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -45,13 +47,13 @@ import { uploadFile } from "~/firebase/storage";
 import { useCookie } from "~/hooks";
 import usersApi from "~/api/usersApi/usersApi";
 import { userConst } from "~/api/constant";
+import routes from "~/configs/routes";
 
 const cx = classNames.bind(style);
 var delete_cookie = function (name) {
     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 };
-const defaultThumbnail =
-    "https://assets-cdn.kahoot.it/builder/v2/assets/placeholder-cover-kahoot-dca23b0a.png";
+const defaultThumbnail = images.defaultThumbnail;
 
 const timeOptions = [
     { value: "5", label: "5 seconds" },
@@ -77,6 +79,7 @@ const typeOptions = [
 const answerTemplate = ["A", "B", "C", "D"];
 
 const Create = () => {
+    let { id } = useParams();
     const [currentQuestIndex, setCurrentQuestIndex] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [isDone, setIsDone] = useState(false);
@@ -288,6 +291,47 @@ const Create = () => {
     const questionRef = useRef(null);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (id) {
+            console.log(id);
+            (async function handleGetQuiz() {
+                try {
+                    const response = await usersApi.getQuizInfo(
+                        accessToken,
+                        id
+                    );
+                    let result = response;
+                    if (result.status === "success") {
+                        console.log(response.data);
+
+                        const questtionData = response.data.questions.map(
+                            (item, index) => ({
+                                id: item.quiz_id,
+                                question: item.question,
+                                imageUri: item.image_uri,
+                                selections: [
+                                    item.answerA,
+                                    item.answerB,
+                                    item.answerC,
+                                    item.answerD,
+                                ],
+                                answer: item.answer,
+                                readingTime: item.time_prepare,
+                                timeLimit: item.time_waiting,
+                                type: "quiz",
+                            })
+                        );
+                        setQuestionsList(questtionData);
+                    } else {
+                        if (result.error === userConst.authenticationFailed) {
+                            delete_cookie("access_token");
+                        }
+                    }
+                } catch (error) {}
+            })();
+        }
+    }, [id, accessToken]);
 
     const handleChangeThumbnail = (e) => {
         const file = e.target.files[0];
@@ -655,7 +699,7 @@ const Create = () => {
                         console.log(response.data);
                         toast.success("Quiz created successfully!");
                         setTimeout(() => {
-                            navigate("/myquiz");
+                            navigate(routes.myQuizz);
                         }, 1000);
                     } else {
                         if (result.error === userConst.authenticationFailed) {
@@ -672,21 +716,8 @@ const Create = () => {
         }
     }, [isDone]);
 
-    // useBlocker(
-    //   (tx) => {
-    //     if (hasEdited) {
-    //       const confirm = window.confirm('Your data has not been saved. Do you want to continue?');
-    //       if (!confirm) {
-    //         tx.abort();
-    //         // navigate(tx.location.pathname);
-    //       }
-    //     }
-    //   },
-    //   [navigate]
-    // );
-
     return (
-        <>
+        <div id="create-quiz">
             <div className={cx("wrapper")}>
                 <nav className={cx("navbar")}>
                     <section>
@@ -697,7 +728,7 @@ const Create = () => {
                         >
                             <span>
                                 {sessionInfo.title ||
-                                    "This is title of this Quizzer"}
+                                    "This is title of this Quiz"}
                             </span>
                             <Button outline>Settings</Button>
                         </div>
@@ -736,7 +767,7 @@ const Create = () => {
                                         onMouseUp={() =>
                                             setCurrentQuestIndex(index)
                                         }
-                                        key={question.id}
+                                        key={question.index}
                                         as="div"
                                         value={question}
                                     >
@@ -1234,80 +1265,90 @@ const Create = () => {
                                     </h6>
                                     <div className={cx("setting-container")}>
                                         <section>
-                                            <span>
-                                                <FontAwesomeIcon
-                                                    icon={faCircleQuestion}
-                                                />
-                                                <h6>Question type</h6>
-                                            </span>
-                                            <Select
-                                                className={cx("reading-time")}
-                                                onChange={(data) =>
-                                                    handleQuestSettings(
-                                                        data,
-                                                        "type"
-                                                    )
-                                                }
-                                                value={typeOptions.find(
-                                                    (option) =>
-                                                        option.value ===
-                                                        questionsList[
-                                                            currentQuestIndex
-                                                        ].type
-                                                )}
-                                                options={typeOptions}
-                                            />
-                                            <span>
-                                                <FontAwesomeIcon
-                                                    icon={faHeadSideCough}
-                                                />
-                                                <h6>Reading time</h6>
-                                            </span>
-                                            <Select
-                                                className={cx("reading-time")}
-                                                onChange={(data) =>
-                                                    handleQuestSettings(
-                                                        data,
-                                                        "readingTime"
-                                                    )
-                                                }
-                                                value={
-                                                    timeOptions[
-                                                        timeTemplate.indexOf(
+                                            <div>
+                                                <span>
+                                                    <FontAwesomeIcon
+                                                        icon={faCircleQuestion}
+                                                    />
+                                                    <h6>Question type</h6>
+                                                </span>
+                                                <Select
+                                                    className={cx(
+                                                        "reading-time"
+                                                    )}
+                                                    onChange={(data) =>
+                                                        handleQuestSettings(
+                                                            data,
+                                                            "type"
+                                                        )
+                                                    }
+                                                    value={typeOptions.find(
+                                                        (option) =>
+                                                            option.value ===
                                                             questionsList[
                                                                 currentQuestIndex
-                                                            ].readingTime
-                                                        )
-                                                    ]
-                                                }
-                                                options={timeOptions}
-                                            />
-                                            <span>
-                                                <FontAwesomeIcon
-                                                    icon={faClock}
+                                                            ].type
+                                                    )}
+                                                    options={typeOptions}
                                                 />
-                                                <h6>Time limit</h6>
-                                            </span>
-                                            <Select
-                                                className={cx("time-limit")}
-                                                onChange={(data) =>
-                                                    handleQuestSettings(
-                                                        data,
-                                                        "timeLimit"
-                                                    )
-                                                }
-                                                value={
-                                                    timeOptions[
-                                                        timeTemplate.indexOf(
-                                                            questionsList[
-                                                                currentQuestIndex
-                                                            ].timeLimit
+                                            </div>
+                                            <div>
+                                                <span>
+                                                    <FontAwesomeIcon
+                                                        icon={faHeadSideCough}
+                                                    />
+                                                    <h6>Reading time</h6>
+                                                </span>
+                                                <Select
+                                                    className={cx(
+                                                        "reading-time"
+                                                    )}
+                                                    onChange={(data) =>
+                                                        handleQuestSettings(
+                                                            data,
+                                                            "readingTime"
                                                         )
-                                                    ]
-                                                }
-                                                options={timeOptions}
-                                            />
-                                            <span>
+                                                    }
+                                                    value={
+                                                        timeOptions[
+                                                            timeTemplate.indexOf(
+                                                                questionsList[
+                                                                    currentQuestIndex
+                                                                ].readingTime
+                                                            )
+                                                        ]
+                                                    }
+                                                    options={timeOptions}
+                                                />
+                                            </div>
+                                            <div>
+                                                <span>
+                                                    <FontAwesomeIcon
+                                                        icon={faClock}
+                                                    />
+                                                    <h6>Time limit</h6>
+                                                </span>
+                                                <Select
+                                                    className={cx("time-limit")}
+                                                    onChange={(data) =>
+                                                        handleQuestSettings(
+                                                            data,
+                                                            "timeLimit"
+                                                        )
+                                                    }
+                                                    value={
+                                                        timeOptions[
+                                                            timeTemplate.indexOf(
+                                                                questionsList[
+                                                                    currentQuestIndex
+                                                                ].timeLimit
+                                                            )
+                                                        ]
+                                                    }
+                                                    options={timeOptions}
+                                                />
+                                            </div>
+                                            {/* <span>
                                                 <FontAwesomeIcon
                                                     icon={faCircleCheck}
                                                 />
@@ -1318,7 +1359,7 @@ const Create = () => {
                                                 // onChange={(data) => handleQuestSettings(data, 'option')}
                                                 defaultValue={answerOptions[0]}
                                                 options={answerOptions}
-                                            />
+                                            /> */}
                                         </section>
                                         {/* <div className={cx("footer")}>
                                             <button
@@ -1342,11 +1383,11 @@ const Create = () => {
                     tabIndex="-1"
                     setShow={setSettingModal}
                 >
-                    <MDBModalDialog size="lg">
+                    <MDBModalDialog centered size="lg">
                         <MDBModalContent className={cx("modal-content")}>
                             <MDBModalHeader>
                                 <MDBModalTitle className={cx("modal-title")}>
-                                    QuiZone Summary
+                                    Quiz Summary
                                 </MDBModalTitle>
                                 {/* <MDBBtn
                 className="btn-close"
@@ -1422,12 +1463,12 @@ const Create = () => {
                                             </Button>
                                         </figure>
                                     </div>
-                                    <h6>Language</h6>
-                                    <Form.Select aria-label="Default select example">
+                                    {/* <h6>Language</h6> */}
+                                    {/* <Form.Select aria-label="Default select example">
                                         <option value="en">English</option>
                                         <option value="vi">Vietnamese</option>
                                         <option value="kr">Korean</option>
-                                    </Form.Select>
+                                    </Form.Select> */}
                                 </section>
                             </MDBModalBody>
                             <MDBModalFooter className={cx("modal-footer")}>
@@ -1468,7 +1509,7 @@ const Create = () => {
                     {/* </div> */}
                 </motion.div>
             )}
-        </>
+        </div>
     );
 };
 

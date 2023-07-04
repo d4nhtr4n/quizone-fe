@@ -51,7 +51,7 @@ export default function Play() {
                     replace: true,
                 });
             }
-            console.log("host_disconnect", data);
+            console.log("host_disconnect", data, pinCode);
         });
 
         socketIo.on("next_question_res_player", function (data) {

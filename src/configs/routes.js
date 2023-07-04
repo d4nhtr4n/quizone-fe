@@ -10,6 +10,7 @@ const routes = {
     myQuizz: "/myquizz",
     create: "/create",
     host: "/host/:id",
+    edit: "/edit/:id",
 };
 
 export default routes;

@@ -23,9 +23,11 @@ export default function Answear({
     index,
     selected,
     onClick,
+    style,
 }) {
     return (
         <div
+            style={style}
             className={cx("wrapper", {
                 client: client,
                 disabled: disable,

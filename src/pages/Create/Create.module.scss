@@ -12,7 +12,6 @@
     border-radius: 0.5rem;
 
     .modal-title {
-      color: var(--black-color);
       font-size: var(--text-h4);
       font-weight: 500;
       padding: 0 1rem;
@@ -25,8 +24,6 @@
       padding: 2rem;
 
       .modal-form {
-        color: var(--black-color);
-
         label {
           font-size: var(--text-h6);
           font-weight: 500;
@@ -50,7 +47,6 @@
         display: flex;
         flex-direction: column;
         // background-color: black;
-        color: var(--black-color);
 
         h6,
         label {
@@ -146,7 +142,6 @@
   justify-content: space-between;
   padding: 1rem;
   // background-color: white;
-  background-color: var(--black-color);
 
   section {
     &:first-of-type {
@@ -482,10 +477,12 @@
         align-items: center;
         font-size: var(--text-h6);
         margin-top: 1rem;
+        margin-bottom: 4px;
 
         h6 {
-          font-size: var(--text-h6);
-          margin-left: 1rem;
+          font-size: var(--text-h7);
+          margin-left: 0.5rem;
+          margin-bottom: 0;
         }
       }
 
@@ -555,11 +552,11 @@
         }
       }
 
-      .reading-time,
-      .time-limit,
-      .answer-option {
-        color: var(--black-color);
-      }
+      // .reading-time,
+      // .time-limit,
+      // .answer-option {
+      //   color: var(--black-color);
+      // }
     }
 
     .footer {

@@ -1,0 +1,83 @@
+#create-quiz {
+    .dropdown-menu {
+        background: var(--overlay-6th-color);
+        padding: 4px;
+        border-radius: 4px;
+        width: 95%;
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+    }
+    .dropdown-item {
+        color: #ffffff;
+        font-size: var(--text-h7);
+        padding-left: 4px;
+        padding-right: 4px;
+        border-radius: 2px;
+    }
+    .dropdown-item:hover {
+        background: var(--primary-gradient);
+    }
+    .dropdown button {
+        background-color: transparent !important;
+        text-transform: capitalize;
+        font-size: var(--text-h6);
+        padding: 0;
+        box-shadow: none;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .modal-content {
+        background-color: var(--overlay-1st-color);
+        padding: 16px;
+    }
+
+    .modal-body {
+        max-height: 60vh;
+        overflow-y: scroll;
+        input,
+        textarea {
+            background-color: var(--overlay-6th-color);
+            border: none;
+            color: var(--text-1st-color) !important;
+            box-shadow: var(--primary-box-shadow);
+            // outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+        }
+    }
+
+    .css-13cymwt-control {
+        border: none !important;
+        background-color: var(--overlay-5th-color);
+        * {
+            color: var(--text-1st-color) !important;
+        }
+    }
+
+    .css-t3ipsp-control {
+        box-shadow: none !important;
+        border: none !important;
+        * {
+            color: var(--text-1st-color) !important;
+        }
+    }
+
+    .css-t3ipsp-control,
+    .css-1nmdiq5-menu {
+        background-color: var(--overlay-9th-color);
+    }
+
+    .css-1nmdiq5-menu {
+        .css-tr4s17-option {
+            background-color: var(--primary-color);
+            color: var(--black-color);
+        }
+    }
+
+    .css-d7l1ni-option {
+        color: var(--black-color);
+    }
+}

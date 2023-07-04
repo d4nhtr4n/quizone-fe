@@ -32,6 +32,7 @@ const images = {
     general: require("./general.png"),
     weekly: require("./weekly-winner.png"),
     monthly: require("./monthly-winner.png"),
+    defaultThumbnail: require("./default-thumbnail.jpg"),
 };
 
 export default images;

@@ -201,6 +201,14 @@ export default function Host() {
                     </div>
                 </div>
             )}
+
+            {!waitRoom && (
+                <Image
+                    className={cx("theme-img")}
+                    src={images.defaultThumbnail}
+                />
+            )}
+
             {waitRoom && pinCode && (
                 <div
                     style={{
@@ -281,7 +289,14 @@ export default function Host() {
                         )}
                         <Col lg={6}>
                             {!showResult ? (
-                                <Image src={currentQuestion.image_uri} />
+                                currentQuestion.image_uri ? (
+                                    <Image src={currentQuestion.image_uri} />
+                                ) : (
+                                    <Image
+                                        style={{ visibility: "hidden" }}
+                                        src={currentQuestion.image_uri}
+                                    />
+                                )
                             ) : (
                                 <div>
                                     {chartData && (
@@ -349,19 +364,21 @@ export default function Host() {
                                 currentQuestion.answerD,
                             ].map((option, index, array) => (
                                 <Col lg={6} key={index}>
-                                    <Answear
-                                        disable={
-                                            showResult &&
-                                            index !==
-                                                answerTemplate.indexOf(
-                                                    currentQuestion.answer
-                                                )
-                                        }
-                                        key={index}
-                                        value={option}
-                                        index={index}
-                                        onClick={() => {}}
-                                    />
+                                    {option && (
+                                        <Answear
+                                            disable={
+                                                showResult &&
+                                                index !==
+                                                    answerTemplate.indexOf(
+                                                        currentQuestion.answer
+                                                    )
+                                            }
+                                            key={index}
+                                            value={option}
+                                            index={index}
+                                            onClick={() => {}}
+                                        />
+                                    )}
                                 </Col>
                             ))}
                         </Row>
@@ -402,24 +419,47 @@ export default function Host() {
                             </div>
                             {finalResults && (
                                 <div className={cx("podium-list")}>
-                                    <div className={cx("podium", "podium-2nd")}>
-                                        <Image src={images.podium2nd}></Image>
-                                        {finalResults[1] && (
+                                    {finalResults[1] && (
+                                        <div
+                                            className={cx(
+                                                "podium",
+                                                "podium-2nd"
+                                            )}
+                                        >
+                                            <Image
+                                                src={images.podium2nd}
+                                            ></Image>
                                             <span>{finalResults[1].name}</span>
-                                        )}
-                                    </div>
-                                    <div className={cx("podium", "podium-1st")}>
-                                        <Image src={images.podium1st}></Image>
-                                        {finalResults[0] && (
+                                        </div>
+                                    )}
+                                    {finalResults[0] && (
+                                        <div
+                                            className={cx(
+                                                "podium",
+                                                "podium-1st"
+                                            )}
+                                        >
+                                            <Image
+                                                src={images.podium1st}
+                                            ></Image>
+
                                             <span>{finalResults[0].name}</span>
-                                        )}
-                                    </div>
-                                    <div className={cx("podium", "podium-3rd")}>
-                                        <Image src={images.podium3rd}></Image>
-                                        {finalResults[2] && (
+                                        </div>
+                                    )}
+                                    {finalResults[2] && (
+                                        <div
+                                            className={cx(
+                                                "podium",
+                                                "podium-3rd"
+                                            )}
+                                        >
+                                            <Image
+                                                src={images.podium3rd}
+                                            ></Image>
+
                                             <span>{finalResults[2].name}</span>
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

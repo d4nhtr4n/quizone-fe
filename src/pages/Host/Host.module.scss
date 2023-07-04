@@ -12,6 +12,7 @@
     @include media-breakpoint-down(lg) {
         justify-content: flex-start;
     }
+    position: relative;
 }
 
 .timer-wrapper {
@@ -69,7 +70,7 @@
         border-radius: 4px;
         font-size: 18px;
         font-weight: 500;
-        font-size: var(--text-h3);
+        font-size: var(--text-h4);
 
         @include media-breakpoint-down(sm) {
             font-size: 16px;
@@ -537,6 +538,13 @@ $c: #00ffff #b100da;
             background-position: calc(var(--stripe-size) * -1) 0;
         }
     }
+}
+
+.theme-img {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
 }
 
 .next-button {
