@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
     unstable_useBlocker as useBlocker,
+    useMatch,
     useNavigate,
     useParams,
 } from "react-router-dom";
@@ -79,7 +80,7 @@ const typeOptions = [
 const answerTemplate = ["A", "B", "C", "D"];
 
 const Create = () => {
-    let { id } = useParams();
+    const isEdit = useMatch(routes.edit);
     const [currentQuestIndex, setCurrentQuestIndex] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [isDone, setIsDone] = useState(false);
@@ -292,14 +293,15 @@ const Create = () => {
 
     const navigate = useNavigate();
 
+    // TO DO
     useEffect(() => {
-        if (id) {
-            console.log(id);
+        if (isEdit && isEdit.params.id) {
+            console.log(isEdit.params.id);
             (async function handleGetQuiz() {
                 try {
                     const response = await usersApi.getQuizInfo(
                         accessToken,
-                        id
+                        isEdit.params.id
                     );
                     let result = response;
                     if (result.status === "success") {
@@ -331,7 +333,7 @@ const Create = () => {
                 } catch (error) {}
             })();
         }
-    }, [id, accessToken]);
+    }, [isEdit, accessToken]);
 
     const handleChangeThumbnail = (e) => {
         const file = e.target.files[0];
@@ -745,8 +747,7 @@ const Create = () => {
                         <Button primary onClick={saveSession}>
                             Save
                         </Button>
-                        <Button text onClick={() => navigate(-1)}>
-                            {" "}
+                        <Button text to={routes.myQuizz}>
                             Back
                         </Button>
                     </section>
