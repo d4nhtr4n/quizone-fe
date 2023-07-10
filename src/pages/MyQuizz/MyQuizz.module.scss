@@ -8,6 +8,36 @@
 .card {
     margin-bottom: 32px;
     height: 400px;
+    position: relative;
+
+    .favorite-button {
+        position: absolute;
+        right: 0;
+        top: 0;
+        background-color: rgba($color: #000000, $alpha: 0.3);
+        margin-top: 8px;
+        margin-right: 8px;
+        width: 32px;
+        height: 32px;
+        font-size: var(--text-h5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        color: #fff;
+        transition: all 0.2s linear;
+        cursor: pointer;
+        box-shadow: var(--primary-box-shadow);
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &.active {
+            color: rgb(238, 53, 41);
+            background-color: rgba($color: #000000, $alpha: 0.1);
+        }
+    }
 
     @include media-breakpoint-down(sm) {
         margin-bottom: 15px;

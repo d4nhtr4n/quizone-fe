@@ -17,7 +17,7 @@ const answearIcons = [
 
 const answerTemplate = ['A', 'B', 'C', 'D'];
 
-const Question = ({ data, correct, index, changeData, changeAnswer }) => {
+const Question = ({ data, correct, type, index, changeData, changeAnswer }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState(data);
   // const [selected, setSelected] = useState(false);
@@ -79,7 +79,12 @@ const Question = ({ data, correct, index, changeData, changeAnswer }) => {
             onBlur={(e) => handleInputBlur(e)}
           />
         ) : (
-          <span className={cx('text')} onClick={() => setIsEditing(true)}>
+          <span
+            className={cx('text')}
+            onClick={() => {
+              if (type == 'quiz') setIsEditing(true);
+            }}
+          >
             {text}
           </span>
         )}

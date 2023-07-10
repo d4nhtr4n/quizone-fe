@@ -8,13 +8,17 @@ import images from "~/components/assets/images";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import apiConfig from "~/api/usersApi/apiConfig";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import Button from "~/components/Button/Button";
+import routes from "~/configs/routes";
 const host = apiConfig.socketUrl;
 
 const cx = classNames.bind(style);
 var delete_cookie = function (name) {
     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 };
-const answears = ["A", "B", "C", "D"];
+
 const socketIo = io(host, {
     transports: ["websocket"],
 });
@@ -28,6 +32,35 @@ export default function Play() {
     const [currentQuestionCount, setCurrentQuestionCount] = useState(-1);
     const [started, setStarted] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
+    const [answears, setAnswers] = useState(["A", "B", "C", "D"]);
+    const [showFinal, setShowFinal] = useState(false);
+    const [finalRes, setFinalRes] = useState();
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            // Cancel the event to prevent the browser's default behavior
+            event.preventDefault();
+
+            // Prompt the user with a custom message
+            event.returnValue = "Are you sure you want to leave?";
+        };
+
+        const handlePopstate = () => {
+            // Trigger an alert when the user navigates back
+            alert("You navigated back!");
+        };
+
+        // Add the event listeners when the component mounts
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        window.addEventListener("popstate", handleBeforeUnload);
+
+        // Remove the event listeners when the component unmounts
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            window.removeEventListener("popstate", handleBeforeUnload);
+        };
+    }, []);
+
     useEffect(() => {
         function onConnect() {
             console.log("Connected");
@@ -67,6 +100,11 @@ export default function Play() {
                 setWaitNext(true);
                 setShowMyResult(false);
                 setMyResult();
+                if (data.type === "truefalse") {
+                    setAnswers(["A", "B"]);
+                } else {
+                    setAnswers(["A", "B", "C", "D"]);
+                }
             }
             console.log(data);
         });
@@ -96,6 +134,24 @@ export default function Play() {
         socketIo.on("host_start", function (data) {
             if (data.pin === pinCode) {
                 setStarted(true);
+            }
+        });
+
+        socketIo.on("final_result_res_player", function (data) {
+            if (data.pin === pinCode) {
+                setShowFinal(true);
+                setWaitNext(false);
+                setShowOptions(false);
+                setShowMyResult(false);
+                console.log(data);
+                if (data.result && data.result.length > 0) {
+                    const temp = data.result.filter((obj) => {
+                        return obj.name === name;
+                    });
+                    if (temp && temp.length > 0) {
+                        setFinalRes(temp[0].point);
+                    } else setFinalRes(0);
+                }
             }
         });
 
@@ -190,6 +246,44 @@ export default function Play() {
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+            {showFinal && (
+                <div
+                    className={cx("modal-container", {
+                        active: showFinal,
+                    })}
+                >
+                    <div className={cx("modal-background")}>
+                        <div className={cx("area")}>
+                            <ul className={cx("circles")}>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+                        <div className={cx("modal")}>
+                            <Button
+                                className={cx("close-btn")}
+                                rightIcon={
+                                    <FontAwesomeIcon icon={faCircleXmark} />
+                                }
+                                to={routes.join}
+                            />
+                            <div className={cx("congrats")}>
+                                <h1>Congratulations!</h1>
+                                <p>{`Your score is ${finalRes}`}</p>
+                                <p>{`Please check the leaderboard on the host's screen.`}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

@@ -23,8 +23,16 @@ import {
     Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { faCircleXmark, faSquare } from "@fortawesome/free-solid-svg-icons";
+import {
+    faCircleXmark,
+    faCopy,
+    faSquare,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import routes from "~/configs/routes";
+import ReactSwitch from "react-switch";
+import { toast } from "react-hot-toast";
+// import "./Host.scss";
 
 ChartJS.register(
     CategoryScale,
@@ -102,6 +110,9 @@ export default function Host() {
     const [trueIndex, setTrueIndex] = useState(-1);
     const [showFinal, setShowFinal] = useState(false);
     const [finalResults, setFinalResults] = useState([]);
+    const [theme, setTheme] = useState();
+    const [isMix, setIsMix] = useState(true);
+    const pinRef = useRef();
 
     useEffect(() => {
         (async function handleGetList() {
@@ -111,6 +122,23 @@ export default function Host() {
                 console.log(result);
                 if (result.status === "success") {
                     setPinCode(response.data.pin);
+                } else {
+                    if (result.error === userConst.authenticationFailed) {
+                        delete_cookie("access_token");
+                    }
+                }
+            } catch (error) {}
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        (async function handleGetTheme() {
+            try {
+                const response = await usersApi.getTheme(accessToken, id);
+                let result = response;
+                if (result.status === "success") {
+                    setTheme(result.data.theme);
                 } else {
                     if (result.error === userConst.authenticationFailed) {
                         delete_cookie("access_token");
@@ -166,13 +194,7 @@ export default function Host() {
                                     data.counterD,
                                 ],
                                 borderRadius: 1,
-                                backgroundColor: chartColors.map(
-                                    (color, index) =>
-                                        index ===
-                                        answerTemplate.indexOf(data.answer)
-                                            ? color
-                                            : `${color}59`
-                                ),
+                                backgroundColor: chartColors,
                             },
                         ],
                     });
@@ -192,21 +214,44 @@ export default function Host() {
     useEffect(() => {
         socketIo.emit("host_info_update", { pin: pinCode });
     });
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            // Cancel the event to prevent the browser's default behavior
+            event.preventDefault();
+
+            // Prompt the user with a custom message
+            event.returnValue = "Are you sure you want to leave?";
+        };
+
+        const handlePopstate = () => {
+            // Trigger an alert when the user navigates back
+            alert("You navigated back!");
+        };
+
+        // Add the event listeners when the component mounts
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        window.addEventListener("popstate", handleBeforeUnload);
+
+        // Remove the event listeners when the component unmounts
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            window.removeEventListener("popstate", handleBeforeUnload);
+        };
+    }, []);
+
     return (
         <div className={cx("wrapper")}>
             {waitRoom && pinCode && (
                 <div className={cx("background")}>
-                    <div class={cx("stripe")}>
-                        <div class={cx("stripe_inner")}>WAITING</div>
+                    <div className={cx("stripe")}>
+                        <div className={cx("stripe_inner")}>WAITING</div>
                     </div>
                 </div>
             )}
 
-            {!waitRoom && (
-                <Image
-                    className={cx("theme-img")}
-                    src={images.defaultThumbnail}
-                />
+            {!waitRoom && theme && (
+                <Image className={cx("theme-img")} src={theme} />
             )}
 
             {waitRoom && pinCode && (
@@ -221,8 +266,31 @@ export default function Host() {
                     <div className={cx("wait-room")}>
                         <div className={cx("pin-code")}>
                             PIN:&nbsp;
-                            <span>{pinCode}</span>
+                            <span ref={pinRef}>{pinCode}</span>
+                            <button
+                                className={cx("copy-button")}
+                                onClick={() => {
+                                    navigator.clipboard.writeText(
+                                        pinRef.current.innerText
+                                    );
+                                    toast.success("Pin code copied!");
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faCopy} />
+                            </button>
                         </div>
+
+                        <label className={cx("mix-box")}>
+                            <span>Mix the question?</span>
+                            <ReactSwitch
+                                onChange={() => {
+                                    setIsMix(!isMix);
+                                }}
+                                checked={isMix}
+                                onColor={"#b100da"}
+                            />
+                        </label>
+
                         {players.length > 0 && (
                             <Fragment>
                                 <Button
@@ -235,6 +303,7 @@ export default function Host() {
                                         });
                                         socketIo.emit("host_start", {
                                             pin: pinCode,
+                                            mix: isMix,
                                         });
                                     }}
                                 >
@@ -287,7 +356,7 @@ export default function Host() {
                                 </div>
                             </div>
                         )}
-                        <Col lg={6}>
+                        <Col lg={5}>
                             {!showResult ? (
                                 currentQuestion.image_uri ? (
                                     <Image src={currentQuestion.image_uri} />
@@ -412,7 +481,7 @@ export default function Host() {
                                 rightIcon={
                                     <FontAwesomeIcon icon={faCircleXmark} />
                                 }
-                                to={"/"}
+                                to={routes.myQuizz}
                             />
                             <div className={cx("congrats")}>
                                 <h1>Congratulations!</h1>

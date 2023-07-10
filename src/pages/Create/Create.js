@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
     unstable_useBlocker as useBlocker,
-    useMatch,
     useNavigate,
     useParams,
 } from "react-router-dom";
@@ -30,7 +29,10 @@ import {
     faStreetView,
     faRankingStar,
     faXmark,
+    faTrash,
+    faTrashCan,
     faCircleQuestion,
+    faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import { Reorder, motion, AnimatePresence } from "framer-motion";
@@ -51,21 +53,23 @@ import { userConst } from "~/api/constant";
 import routes from "~/configs/routes";
 
 const cx = classNames.bind(style);
+
 var delete_cookie = function (name) {
     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 };
+
 const defaultThumbnail = images.defaultThumbnail;
 
 const timeOptions = [
-    { value: "5", label: "5 seconds" },
-    { value: "10", label: "10 seconds" },
-    { value: "20", label: "20 seconds" },
-    { value: "30", label: "30 seconds" },
-    { value: "60", label: "1 minutes" },
-    { value: "90", label: "1 minutes 30 seconds" },
+    { value: 5, label: "5 seconds" },
+    { value: 10, label: "10 seconds" },
+    { value: 20, label: "20 seconds" },
+    { value: 30, label: "30 seconds" },
+    { value: 60, label: "1 minutes" },
+    { value: 90, label: "1 minutes 30 seconds" },
 ];
 
-const timeTemplate = ["5s", "10s", "20s", "30s", "1m", "1m30"];
+const timeTemplate = [5, 10, 20, 30, 60, 90];
 
 const answerOptions = [
     { value: "single", label: "Single Choice" },
@@ -77,14 +81,15 @@ const typeOptions = [
     { value: "truefalse", label: "True/False" },
 ];
 
-const answerTemplate = ["A", "B", "C", "D"];
+const answerTemplateQuiz = ["A", "B", "C", "D"];
+const answerTemplateTrueFalse = ["A", "B"];
 
 const Create = () => {
-    const isEdit = useMatch(routes.edit);
+    let { id } = useParams();
     const [currentQuestIndex, setCurrentQuestIndex] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [isDone, setIsDone] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [hasEdited, setHasEdited] = useState(false);
     const accessToken = useCookie("access_token");
 
@@ -293,48 +298,6 @@ const Create = () => {
 
     const navigate = useNavigate();
 
-    // TO DO
-    useEffect(() => {
-        if (isEdit && isEdit.params.id) {
-            console.log(isEdit.params.id);
-            (async function handleGetQuiz() {
-                try {
-                    const response = await usersApi.getQuizInfo(
-                        accessToken,
-                        isEdit.params.id
-                    );
-                    let result = response;
-                    if (result.status === "success") {
-                        console.log(response.data);
-
-                        const questtionData = response.data.questions.map(
-                            (item, index) => ({
-                                id: item.quiz_id,
-                                question: item.question,
-                                imageUri: item.image_uri,
-                                selections: [
-                                    item.answerA,
-                                    item.answerB,
-                                    item.answerC,
-                                    item.answerD,
-                                ],
-                                answer: item.answer,
-                                readingTime: item.time_prepare,
-                                timeLimit: item.time_waiting,
-                                type: "quiz",
-                            })
-                        );
-                        setQuestionsList(questtionData);
-                    } else {
-                        if (result.error === userConst.authenticationFailed) {
-                            delete_cookie("access_token");
-                        }
-                    }
-                } catch (error) {}
-            })();
-        }
-    }, [isEdit, accessToken]);
-
     const handleChangeThumbnail = (e) => {
         const file = e.target.files[0];
 
@@ -401,6 +364,7 @@ const Create = () => {
                 ...prev,
                 ...modalInputs,
             }));
+            console.log(modalInputs);
             if (Object.values(modalInputs).some((value) => value !== ""))
                 setHasEdited(true);
         } else {
@@ -408,12 +372,7 @@ const Create = () => {
                 setModalInputs({
                     title: sessionInfo.title,
                     description: sessionInfo.description,
-                    thumbnailUri: {
-                        imgSrc:
-                            sessionInfo.thumbnailUri ||
-                            defaultThumbnail ||
-                            null,
-                    },
+                    thumbnailUri: sessionInfo.thumbnailUri,
                 });
                 setSelectedThumbnail(null);
             }
@@ -450,13 +409,17 @@ const Create = () => {
 
     const changeAnswer = (data) => {
         const { index } = data;
+        console.log(data);
 
         setQuestionsList((prevList) => {
             const updatedList = [...prevList];
             const currentQuestion = updatedList[currentQuestIndex];
 
             if (currentQuestion) {
-                currentQuestion.answer = answerTemplate[index];
+                if (currentQuestion.type === "quiz")
+                    currentQuestion.answer = answerTemplateQuiz[index];
+                else if (currentQuestion.type === "truefalse")
+                    currentQuestion.answer = answerTemplateTrueFalse[index];
             }
 
             return updatedList;
@@ -475,11 +438,15 @@ const Create = () => {
             const selectionLength = currentQuestion.selections.length;
 
             if (type === "type" && data.value === "quiz") {
-                if (selectionLength === 2)
+                if (selectionLength === 2) {
                     currentQuestion.selections = ["", "", "", ""];
+                    currentQuestion.answer = "A";
+                }
             } else if (type === "type" && data.value === "truefalse") {
-                if (selectionLength === 4)
-                    currentQuestion.selections = ["True", "False"];
+                if (selectionLength === 4) {
+                    currentQuestion.selections = ["False", "True"];
+                    currentQuestion.answer = "False";
+                }
             }
 
             updatedQuestionsList[currentQuestIndex] = currentQuestion;
@@ -508,7 +475,7 @@ const Create = () => {
         const listLength = questionsList.length;
         // Check if there is only one item left in the array
         if (listLength === 1) {
-            alert("Cannot delete the last question.");
+            toast.error("Cannot delete the last question.");
             return;
         }
         // Remove the item with the given index
@@ -683,40 +650,156 @@ const Create = () => {
 
     useEffect(() => {
         if (isDone && validateFields()) {
-            const formData = {
+            const createdDate = {
                 ...sessionInfo,
                 questions: [...questionsList],
             };
-            console.log(formData);
 
-            (async function handleCreateQuiz() {
+            const updatedData = {
+                ...sessionInfo,
+                thumbnailUri: sessionInfo.thumbnailUri.imgSrc || "",
+                questions: questionsList.map((item) => {
+                    if (typeof item.imageUri === "object") {
+                        return {
+                            ...item,
+                            imageUri: item.imageUri.imgSrc,
+                        };
+                    }
+                    return item;
+                }),
+            };
+
+            if (!id) {
+                (async function handleCreateQuiz() {
+                    try {
+                        const response = await usersApi.createNewQuiz(
+                            accessToken,
+                            createdDate
+                        );
+                        let result = response;
+                        console.log("Create new quizz", result);
+                        if (result.status === "success") {
+                            toast.success("Quiz created successfully!");
+                            setTimeout(() => {
+                                navigate(routes.myQuizz);
+                            }, 1000);
+                        } else {
+                            if (
+                                result.error === userConst.authenticationFailed
+                            ) {
+                                delete_cookie("access_token");
+                                toast.error(
+                                    "Authentication Failed! Please login again."
+                                );
+                                navigate("/login");
+                            }
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                })();
+            } else {
+                (async function handleUpdateQuiz() {
+                    try {
+                        const response = await usersApi.updateQuizInfo(
+                            accessToken,
+                            updatedData
+                        );
+                        let result = response;
+                        console.log("Update old quizz", result);
+                        if (result.status === "success") {
+                            toast.success("Quiz updated successfully!");
+                            setTimeout(() => {
+                                navigate(routes.myQuizz);
+                            }, 1000);
+                        } else {
+                            if (
+                                result.error === userConst.authenticationFailed
+                            ) {
+                                delete_cookie("access_token");
+                                toast.error(
+                                    "Authentication Failed! Please login again."
+                                );
+                                navigate("/login");
+                            }
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                })();
+            }
+        }
+    }, [isDone]);
+
+    useEffect(() => {
+        if (id) {
+            (async function handleGetQuiz() {
                 try {
-                    const response = await usersApi.createNewQuiz(
+                    const response = await usersApi.getQuizInfo(
                         accessToken,
-                        formData
+                        id
                     );
                     let result = response;
-                    console.log("Create new quizz", result);
                     if (result.status === "success") {
-                        console.log(response.data);
-                        toast.success("Quiz created successfully!");
-                        setTimeout(() => {
-                            navigate(routes.myQuizz);
-                        }, 1000);
+                        const questionData = response.data.questions.map(
+                            (item, index) => {
+                                const selections =
+                                    item.type === "quiz"
+                                        ? [
+                                              item.answerA,
+                                              item.answerB,
+                                              item.answerC,
+                                              item.answerD,
+                                          ]
+                                        : [item.answerA, item.answerB];
+
+                                return {
+                                    id: item._id,
+                                    question: item.question,
+                                    imageUri: {
+                                        imgSrc: item.image_uri,
+                                    },
+                                    selections: selections,
+                                    answer: item.answer,
+                                    readingTime: item.time_prepare,
+                                    timeLimit: item.time_waiting,
+                                    type: item.type,
+                                };
+                            }
+                        );
+
+                        setQuestionsList(questionData);
+                        setSessionInfo({
+                            uid: response.data.quiz._id,
+                            title: response.data.quiz.name,
+                            description: response.data.quiz.description,
+                            thumbnailUri: {
+                                imgSrc: response.data.quiz.thumbnail_uri,
+                            },
+                            theme: response.data.quiz.theme,
+                        });
+                        setModalInputs({
+                            title: response.data.quiz.name,
+                            description: response.data.quiz.description,
+                            thumbnailUri: {
+                                imgSrc: response.data.quiz.thumbnail_uri,
+                            },
+                        });
+                        setIsLoading(false);
                     } else {
                         if (result.error === userConst.authenticationFailed) {
                             delete_cookie("access_token");
-                            toast.error(
-                                "Authentication Failed! Please login again."
-                            );
-
-                            navigate("/login");
                         }
+                        toast.error("Error occured while loading data.");
                     }
-                } catch (error) {}
+                } catch (error) {
+                    navigate("/pagenotfound");
+                }
             })();
+        } else if (!id) {
+            setIsLoading(false);
         }
-    }, [isDone]);
+    }, [id, accessToken]);
 
     return (
         <div id="create-quiz">
@@ -747,7 +830,8 @@ const Create = () => {
                         <Button primary onClick={saveSession}>
                             Save
                         </Button>
-                        <Button text to={routes.myQuizz}>
+                        <Button text onClick={() => navigate(-1)}>
+                            {" "}
                             Back
                         </Button>
                     </section>
@@ -768,7 +852,7 @@ const Create = () => {
                                         onMouseUp={() =>
                                             setCurrentQuestIndex(index)
                                         }
-                                        key={question.index}
+                                        key={question.id ? question.id : index}
                                         as="div"
                                         value={question}
                                     >
@@ -793,13 +877,12 @@ const Create = () => {
                     </aside>
 
                     <div className={cx("question-frame")}>
-                        {sessionInfo.theme && sessionInfo.theme.imageUrl && (
+                        {sessionInfo.theme && (
                             <div
                                 className={cx("backdrop")}
                                 style={{
                                     backgroundImage:
-                                        `url(${sessionInfo.theme?.imageUrl})` ||
-                                        null,
+                                        `url(${sessionInfo.theme})` || null,
                                 }}
                             ></div>
                         )}
@@ -861,19 +944,47 @@ const Create = () => {
                                                 ?.imageUri.imgSrc
                                         }
                                         alt="Placeholder Image"
+                                        style={{ height: "100%" }}
                                     />
                                 )}
-                                <button
-                                    onClick={() =>
-                                        questImgInputRef.current.click()
-                                    }
-                                >
-                                    +
-                                </button>
+                                <div>
+                                    <button
+                                        onClick={() =>
+                                            questImgInputRef.current.click()
+                                        }
+                                    >
+                                        +
+                                    </button>
+                                    {questionsList[currentQuestIndex]
+                                        ?.imageUri && (
+                                        <button
+                                            onClick={() => {
+                                                if (questImgInputRef.current) {
+                                                    questImgInputRef.current.value =
+                                                        "";
+                                                }
+                                                const updatedQuests = [
+                                                    ...questionsList,
+                                                ];
+                                                updatedQuests[
+                                                    currentQuestIndex
+                                                ] = {
+                                                    ...updatedQuests[
+                                                        currentQuestIndex
+                                                    ],
+                                                    imageUri: "",
+                                                };
+                                                setQuestionsList(updatedQuests);
+                                            }}
+                                        >
+                                            -
+                                        </button>
+                                    )}
+                                </div>
                             </figure>
                             <div className={cx("answers")}>
                                 <Container>
-                                    {questionsList[currentQuestIndex].type ===
+                                    {questionsList[currentQuestIndex]?.type ===
                                     "quiz" ? (
                                         <Row style={{ height: "300px" }}>
                                             {questionsList[
@@ -887,9 +998,14 @@ const Create = () => {
                                                                 questionsList[
                                                                     currentQuestIndex
                                                                 ]?.answer ===
-                                                                answerTemplate[
+                                                                answerTemplateQuiz[
                                                                     index
                                                                 ]
+                                                            }
+                                                            type={
+                                                                questionsList[
+                                                                    currentQuestIndex
+                                                                ].type
                                                             }
                                                             index={index}
                                                             changeData={
@@ -916,7 +1032,12 @@ const Create = () => {
                                                         questionsList[
                                                             currentQuestIndex
                                                         ]?.answer ===
-                                                        answerTemplate[0]
+                                                        answerTemplateTrueFalse[0]
+                                                    }
+                                                    type={
+                                                        questionsList[
+                                                            currentQuestIndex
+                                                        ].type
                                                     }
                                                     index={0}
                                                     changeData={changeData}
@@ -934,7 +1055,12 @@ const Create = () => {
                                                         questionsList[
                                                             currentQuestIndex
                                                         ]?.answer ===
-                                                        answerTemplate[1]
+                                                        answerTemplateTrueFalse[1]
+                                                    }
+                                                    type={
+                                                        questionsList[
+                                                            currentQuestIndex
+                                                        ].type
                                                     }
                                                     index={1}
                                                     changeData={changeData}
@@ -975,12 +1101,7 @@ const Create = () => {
                                                 defaultActiveKey={["0"]}
                                                 alwaysOpen
                                             >
-                                                <Accordion.Item
-                                                    eventKey="0"
-                                                    onClick={(e) =>
-                                                        console.log(e.target)
-                                                    }
-                                                >
+                                                <Accordion.Item eventKey="0">
                                                     <Accordion.Header
                                                         className={cx(
                                                             "accordion-header"
@@ -1014,17 +1135,13 @@ const Create = () => {
                                                                         "theme-item",
                                                                         {
                                                                             selected:
-                                                                                sessionInfo
-                                                                                    .theme
-                                                                                    .id ===
-                                                                                theme.id,
+                                                                                sessionInfo.theme ===
+                                                                                theme.imageUrl,
                                                                         },
                                                                         {
                                                                             selected:
-                                                                                sessionInfo
-                                                                                    .theme
-                                                                                    .id ===
-                                                                                    undefined &&
+                                                                                sessionInfo.theme ===
+                                                                                    "" &&
                                                                                 theme.id ===
                                                                                     0,
                                                                         }
@@ -1039,7 +1156,7 @@ const Create = () => {
                                                                                     prev
                                                                                 ) => ({
                                                                                     ...prev,
-                                                                                    theme,
+                                                                                    theme: theme.imageUrl,
                                                                                 })
                                                                             );
                                                                         else
@@ -1391,10 +1508,10 @@ const Create = () => {
                                     Quiz Summary
                                 </MDBModalTitle>
                                 {/* <MDBBtn
-                className="btn-close"
-                color="none"
-                onClick={() => setOptSmModal(!optSmModal)}
-              ></MDBBtn> */}
+                                        className="btn-close"
+                                        color="none"
+                                        onClick={() => setOptSmModal(!optSmModal)}
+                                    ></MDBBtn> */}
                             </MDBModalHeader>
                             <MDBModalBody className={cx("modal-body")}>
                                 <Form className={cx("modal-form")}>
@@ -1405,6 +1522,7 @@ const Create = () => {
                                         <Form.Label>Title</Form.Label>
                                         <Form.Control
                                             type="text"
+                                            value={modalInputs.title}
                                             onChange={(e) =>
                                                 setModalInputs((prev) => ({
                                                     ...prev,
@@ -1421,6 +1539,7 @@ const Create = () => {
                                         <Form.Control
                                             as="textarea"
                                             rows={5}
+                                            value={modalInputs.description}
                                             onChange={(e) =>
                                                 setModalInputs((prev) => ({
                                                     ...prev,
@@ -1454,6 +1573,8 @@ const Create = () => {
                                                 }
                                                 alt="Placeholder Image"
                                             />
+                                        </figure>
+                                        <div>
                                             <Button
                                                 outline
                                                 onClick={() =>
@@ -1462,7 +1583,32 @@ const Create = () => {
                                             >
                                                 Change
                                             </Button>
-                                        </figure>
+                                            {(selectedThumbnail !== null ||
+                                                modalInputs.thumbnailUri
+                                                    ?.imgSrc !==
+                                                    "/static/media/default-thumbnail.47b4c6beedfaab5c2f2a.jpg") && (
+                                                <FontAwesomeIcon
+                                                    style={{ color: "#c10b0b" }}
+                                                    icon={faTrashCan}
+                                                    onClick={() => {
+                                                        console.log("Click");
+                                                        setSelectedThumbnail(
+                                                            null
+                                                        );
+                                                        setModalInputs(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                thumbnailUri: {
+                                                                    imgSrc:
+                                                                        defaultThumbnail ||
+                                                                        null,
+                                                                },
+                                                            })
+                                                        );
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
                                     </div>
                                     {/* <h6>Language</h6> */}
                                     {/* <Form.Select aria-label="Default select example">
@@ -1495,9 +1641,9 @@ const Create = () => {
 
             {isLoading && (
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.3 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
+                    //   initial={{ opacity: 0, scale: 0.3 }}
+                    //   animate={{ opacity: 1, scale: 1 }}
+                    //   transition={{ duration: 0.005 }}
                     className={cx("overlay")}
                 >
                     {/* <div className={cx('overlay')}> */}

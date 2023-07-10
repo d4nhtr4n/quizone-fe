@@ -20,6 +20,14 @@ import routes from "~/configs/routes";
 import { useCookie } from "~/hooks";
 import { useEffect } from "react";
 import usersApi from "~/api/usersApi/usersApi";
+import { Dropdown } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faAdd,
+    faArrowRightFromBracket,
+    faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
+import { faSquarePlus } from "@fortawesome/free-regular-svg-icons";
 
 const cx = classNames.bind(style);
 
@@ -122,7 +130,27 @@ export default function Header() {
                                 </div>
                             </div>
                         ) : (
-                            <div>{userName}</div>
+                            <Dropdown>
+                                <Dropdown.Toggle
+                                    variant="success"
+                                    id="dropdown-basic"
+                                >
+                                    {userName}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu align={"end"}>
+                                    <Dropdown.Item onClick={() => {}}>
+                                        New Account
+                                        <FontAwesomeIcon icon={faSquarePlus} />
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => {}}>
+                                        Log out
+                                        <FontAwesomeIcon
+                                            icon={faArrowRightFromBracket}
+                                        />
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         )}
                     </MDBCollapse>
                 </MDBContainer>

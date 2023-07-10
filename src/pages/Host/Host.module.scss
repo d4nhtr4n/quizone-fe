@@ -70,7 +70,7 @@
         border-radius: 4px;
         font-size: 18px;
         font-weight: 500;
-        font-size: var(--text-h4);
+        font-size: var(--text-h5);
 
         @include media-breakpoint-down(sm) {
             font-size: 16px;
@@ -545,6 +545,7 @@ $c: #00ffff #b100da;
     height: 100%;
     width: 100%;
     object-fit: cover;
+    opacity: 0.5;
 }
 
 .next-button {
@@ -650,6 +651,32 @@ $c: #00ffff #b100da;
     right: 0;
     padding: 0;
     min-width: auto;
+}
+
+.copy-button {
+    font-size: 20px;
+    color: var(--white-color);
+    background-color: transparent;
+    padding: 4px;
+    margin-left: 2px;
+    transform: translateY(-100%);
+    border-radius: 4px;
+    transition: all 0.2s linear;
+
+    &:hover {
+        color: var(--primary-color);
+        background-color: rgba($color: #000000, $alpha: 0.9);
+    }
+}
+
+.mix-box {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+
+    span {
+        margin-right: 8px;
+    }
 }
 
 .timer {

@@ -25,6 +25,8 @@ import {
 import Answear from "~/components/Answear/Answear";
 import Image from "~/components/Image/Image";
 import { Form, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 const cx = classNames.bind(style);
 const temp = ["a", "a", "a", "a", "a", "a", "a", "a", "a"];
 var delete_cookie = function (name) {
@@ -88,6 +90,71 @@ export default function MyQuizz() {
                                             bg="dark"
                                             text="light"
                                         >
+                                            <div
+                                                className={cx(
+                                                    "favorite-button",
+                                                    {
+                                                        active: item.favorite,
+                                                    }
+                                                )}
+                                                onClick={() => {
+                                                    (async function handleGetList() {
+                                                        try {
+                                                            const response =
+                                                                await usersApi.markFavoriteQuiz(
+                                                                    accessToken,
+                                                                    item._id,
+                                                                    !quizzList[
+                                                                        index
+                                                                    ].favorite
+                                                                );
+                                                            let result =
+                                                                response;
+                                                            console.log(result);
+                                                            if (
+                                                                result.status ===
+                                                                "success"
+                                                            ) {
+                                                                setQuizzList(
+                                                                    quizzList.map(
+                                                                        (
+                                                                            quizItem,
+                                                                            quizIndex
+                                                                        ) => {
+                                                                            if (
+                                                                                quizIndex ===
+                                                                                index
+                                                                            ) {
+                                                                                return {
+                                                                                    ...quizItem,
+                                                                                    favorite:
+                                                                                        result
+                                                                                            .quiz
+                                                                                            .favorite,
+                                                                                };
+                                                                            }
+                                                                            return quizItem;
+                                                                        }
+                                                                    )
+                                                                );
+                                                            } else {
+                                                                if (
+                                                                    result.error ===
+                                                                    userConst.authenticationFailed
+                                                                ) {
+                                                                    delete_cookie(
+                                                                        "access_token"
+                                                                    );
+                                                                }
+                                                            }
+                                                        } catch (error) {}
+                                                    })();
+                                                }}
+                                            >
+                                                <FontAwesomeIcon
+                                                    icon={faHeart}
+                                                />
+                                            </div>
                                             <Card.Img
                                                 variant="top"
                                                 src={

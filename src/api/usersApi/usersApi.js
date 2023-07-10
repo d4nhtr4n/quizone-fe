@@ -40,6 +40,18 @@ const usersApi = {
         const url = `/library/view?id=${id}`;
         return axiosClient(token).get(url, {});
     },
+    updateQuizInfo: (token, data) => {
+        const url = `/quiz/update?id=${data.uid}`;
+        return axiosClient(token).post(url, { data });
+    },
+    markFavoriteQuiz: (token, id, value) => {
+        const url = `/library/setFavorite?id=${id}&value=${value}`;
+        return axiosClient(token).post(url, {});
+    },
+    getTheme: (token, id) => {
+        const url = `/library/getTheme?id=${id}`;
+        return axiosClient(token).get(url, {});
+    },
     // forgotPassword: (email) => {
     //     const url = `/api/auth/forgotpassword`;
     //     return axiosClient().post(url, {

@@ -390,3 +390,34 @@
     font-weight: 600;
     display: inline-block;
 }
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    font-size: 30px;
+    right: 0;
+    padding: 0;
+    min-width: auto;
+}
+
+.congrats {
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+
+    p {
+        font-size: var(--text-h3) !important;
+    }
+
+    h1 {
+        // transform-origin: 50% 50%;
+        font-family: "Sigmar One", cursive;
+        cursor: pointer;
+        z-index: 2;
+        font-size: 6vw;
+        // position: absolute;
+        // top: 0;
+        text-align: center;
+        width: 100%;
+    }
+}

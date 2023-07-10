@@ -14,6 +14,7 @@ import Button from "~/components/Button";
 import Image from "~/components/Image";
 
 import style from "../Authentication.module.scss";
+import usersApi from "~/api/usersApi/usersApi";
 
 const cx = classNames.bind(style);
 
@@ -94,69 +95,37 @@ function Register() {
                 </p>
                 <Formik
                     initialValues={{
-                        username: "",
                         email: "",
                         password: "",
                         confirmPassword: "",
                         agreement: true,
                     }}
                     onSubmit={(values) => {
-                        // (async function handleRegister() {
-                        //     try {
-                        //         const response = await usersApi.register(
-                        //             values.username,
-                        //             values.email,
-                        //             values.password
-                        //         );
-                        //         let result = response;
-                        //         if (result.sucess) {
-                        //             localStorage.setItem(
-                        //                 "auth_token",
-                        //                 result.token
-                        //             );
-                        //             setRegisterFailed(null);
-                        //             navigate("/", {
-                        //                 replace: true,
-                        //             });
-                        //         }
-                        //     } catch (error) {
-                        //         setRegisterFailed(error.response.data.error);
-                        //     }
-                        // })();
+                        (async function handleRegister() {
+                            try {
+                                const response = await usersApi.register(
+                                    values.email,
+                                    values.password
+                                );
+                                let result = response;
+                                if (result.status === "success") {
+                                    console.log(result);
+                                    document.cookie =
+                                        "access_token=" + result.data.cookie;
+                                    navigate("/", {
+                                        replace: true,
+                                    });
+                                } else {
+                                    console.log(result);
+                                }
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        })();
                     }}
                 >
                     {({ values, errors, touched, validateForm }) => (
                         <Form className={cx("form")}>
-                            <div className={cx("field")}>
-                                <div className={cx("input-wrapper")}>
-                                    <Field
-                                        name="username"
-                                        validate={validateName}
-                                        required
-                                    />
-                                    <p>Name</p>
-                                    <span
-                                        className={cx({
-                                            error:
-                                                errors.username &&
-                                                touched.username,
-                                        })}
-                                    />
-                                </div>
-                                <div
-                                    className={cx("notify", {
-                                        visible:
-                                            errors.username && touched.username,
-                                    })}
-                                >
-                                    <FontAwesomeIcon
-                                        className={cx("icon")}
-                                        icon={faCircleExclamation}
-                                    />
-                                    {errors.username || "Placehoder"}
-                                </div>
-                            </div>
-
                             <div className={cx("field")}>
                                 <div className={cx("input-wrapper")}>
                                     <Field
