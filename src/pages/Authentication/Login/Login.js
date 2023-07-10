@@ -15,6 +15,7 @@ import Image from "~/components/Image";
 import style from "../Authentication.module.scss";
 import images from "~/components/assets/images";
 import usersApi from "~/api/usersApi/usersApi";
+import routes from "~/configs/routes";
 
 const cx = classNames.bind(style);
 
@@ -35,7 +36,13 @@ function Login() {
     return (
         <div className={cx("wrapper", "login")}>
             <div className={cx("welcome")}>
-                <Image className={cx("logo")} src={images.logoWithText} />
+                <Image
+                    className={cx("logo")}
+                    src={images.logoWithText}
+                    onClick={() => {
+                        navigate(routes.home);
+                    }}
+                />
                 <div className={cx("content")}>
                     <div>
                         <Image className={cx("robot")} src={images.robot} />

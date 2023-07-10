@@ -5,7 +5,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Image from "~/components/Image/Image";
 import images from "~/components/assets/images";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import apiConfig from "~/api/usersApi/apiConfig";
 import { useCookie } from "~/hooks";
@@ -23,15 +23,12 @@ import {
     Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import {
-    faCircleXmark,
-    faCopy,
-    faSquare,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import routes from "~/configs/routes";
 import ReactSwitch from "react-switch";
 import { toast } from "react-hot-toast";
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 // import "./Host.scss";
 
 ChartJS.register(
@@ -318,6 +315,27 @@ export default function Host() {
                                 return (
                                     <div key={index} className={cx("player")}>
                                         {player}
+                                        <button
+                                            className={cx("kick-button")}
+                                            onClick={() => {
+                                                socketIo.emit(
+                                                    "kick_player_req",
+                                                    {
+                                                        pin: pinCode,
+                                                        name: player,
+                                                    }
+                                                );
+                                                const newPlayerList = [
+                                                    ...players,
+                                                ];
+                                                newPlayerList.splice(index, 1);
+                                                setPlayers(newPlayerList);
+                                            }}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faCircleXmark}
+                                            />
+                                        </button>
                                     </div>
                                 );
                             })}
@@ -462,6 +480,16 @@ export default function Host() {
                 >
                     <div className={cx("modal-background")}>
                         <div className={cx("area")}>
+                            <div className={cx("navigate-logo")}>
+                                <Link to={routes.home}>
+                                    <Image src={images.logo} />
+                                </Link>
+                            </div>
+                            <div className={cx("close-btn")}>
+                                <Link to={routes.join}>
+                                    <FontAwesomeIcon icon={faCircleXmark} />
+                                </Link>
+                            </div>
                             <ul className={cx("circles")}>
                                 <li></li>
                                 <li></li>
@@ -476,13 +504,6 @@ export default function Host() {
                             </ul>
                         </div>
                         <div className={cx("modal")}>
-                            <Button
-                                className={cx("close-btn")}
-                                rightIcon={
-                                    <FontAwesomeIcon icon={faCircleXmark} />
-                                }
-                                to={routes.myQuizz}
-                            />
                             <div className={cx("congrats")}>
                                 <h1>Congratulations!</h1>
                             </div>
@@ -499,6 +520,7 @@ export default function Host() {
                                                 src={images.podium2nd}
                                             ></Image>
                                             <span>{finalResults[1].name}</span>
+                                            <p>{`${finalResults[1].point} points`}</p>
                                         </div>
                                     )}
                                     {finalResults[0] && (
@@ -513,6 +535,7 @@ export default function Host() {
                                             ></Image>
 
                                             <span>{finalResults[0].name}</span>
+                                            <p>{`${finalResults[0].point} points`}</p>
                                         </div>
                                     )}
                                     {finalResults[2] && (
@@ -527,6 +550,7 @@ export default function Host() {
                                             ></Image>
 
                                             <span>{finalResults[2].name}</span>
+                                            <p>{`${finalResults[2].point} points`}</p>
                                         </div>
                                     )}
                                 </div>

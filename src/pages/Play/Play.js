@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Image from "~/components/Image/Image";
 import images from "~/components/assets/images";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import apiConfig from "~/api/usersApi/apiConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -69,6 +69,17 @@ export default function Play() {
         function onDisconnect() {
             console.log("Disconnected");
         }
+
+        socketIo.on("kick_player_res", async function (data) {
+            if (data) {
+                if (data.pin === pinCode && data.name === name) {
+                    navigate(routes.join, {
+                        replace: true,
+                    });
+                }
+                console.log(data);
+            }
+        });
 
         socketIo.on("game_alive", function (data) {
             if (data === false) {
@@ -256,6 +267,16 @@ export default function Play() {
                 >
                     <div className={cx("modal-background")}>
                         <div className={cx("area")}>
+                            <div className={cx("navigate-logo")}>
+                                <Link to={routes.home}>
+                                    <Image src={images.logo} />
+                                </Link>
+                            </div>
+                            <div className={cx("close-btn")}>
+                                <Link to={routes.join}>
+                                    <FontAwesomeIcon icon={faCircleXmark} />
+                                </Link>
+                            </div>
                             <ul className={cx("circles")}>
                                 <li></li>
                                 <li></li>
@@ -270,13 +291,6 @@ export default function Play() {
                             </ul>
                         </div>
                         <div className={cx("modal")}>
-                            <Button
-                                className={cx("close-btn")}
-                                rightIcon={
-                                    <FontAwesomeIcon icon={faCircleXmark} />
-                                }
-                                to={routes.join}
-                            />
                             <div className={cx("congrats")}>
                                 <h1>Congratulations!</h1>
                                 <p>{`Your score is ${finalRes}`}</p>

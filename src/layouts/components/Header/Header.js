@@ -15,7 +15,7 @@ import classNames from "classnames/bind";
 import style from "./Header.module.scss";
 import "./Header.scss";
 import Button from "~/components/Button/Button";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import routes from "~/configs/routes";
 import { useCookie } from "~/hooks";
 import { useEffect } from "react";
@@ -39,8 +39,9 @@ export default function Header() {
     const [showBasic, setShowBasic] = useState(false);
     const { pathname } = useLocation();
     const accessToken = useCookie("access_token");
-    const [loggedIn, setLoggedIn] = useState(true);
+    const [loggedIn, setLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
+    const navigate = useNavigate();
     useEffect(() => {
         (async function handleLogin() {
             try {
@@ -56,7 +57,9 @@ export default function Header() {
                     setLoggedIn(false);
                     delete_cookie("access_token");
                 }
-            } catch (error) {}
+            } catch (error) {
+                setLoggedIn(false);
+            }
         })();
     }, [accessToken]);
 
@@ -71,7 +74,11 @@ export default function Header() {
                 bgColor="--header-bg-color"
             >
                 <MDBContainer fluid>
-                    <MDBNavbarBrand to="/#">
+                    <MDBNavbarBrand
+                        onClick={() => {
+                            navigate(routes.home);
+                        }}
+                    >
                         <img
                             className={cx("logo")}
                             src={images.logo}
@@ -130,27 +137,41 @@ export default function Header() {
                                 </div>
                             </div>
                         ) : (
-                            <Dropdown>
-                                <Dropdown.Toggle
-                                    variant="success"
-                                    id="dropdown-basic"
-                                >
-                                    {userName}
-                                </Dropdown.Toggle>
+                            userName && (
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        variant="success"
+                                        id="dropdown-basic"
+                                    >
+                                        {userName}
+                                    </Dropdown.Toggle>
 
-                                <Dropdown.Menu align={"end"}>
-                                    <Dropdown.Item onClick={() => {}}>
-                                        New Account
-                                        <FontAwesomeIcon icon={faSquarePlus} />
-                                    </Dropdown.Item>
-                                    <Dropdown.Item onClick={() => {}}>
-                                        Log out
-                                        <FontAwesomeIcon
-                                            icon={faArrowRightFromBracket}
-                                        />
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                                    <Dropdown.Menu align={"end"}>
+                                        <Dropdown.Item
+                                            onClick={() => {
+                                                navigate(routes.login);
+                                            }}
+                                        >
+                                            New Account
+                                            <FontAwesomeIcon
+                                                icon={faSquarePlus}
+                                            />
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => {
+                                                setLoggedIn(false);
+                                                setUserName("");
+                                                delete_cookie("access_token");
+                                            }}
+                                        >
+                                            Log out
+                                            <FontAwesomeIcon
+                                                icon={faArrowRightFromBracket}
+                                            />
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            )
                         )}
                     </MDBCollapse>
                 </MDBContainer>

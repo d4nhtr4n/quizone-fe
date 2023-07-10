@@ -434,13 +434,28 @@ $c: #00ffff #b100da;
 
         .player {
             font-size: var(--text-h4);
-            padding: 4px 8px;
+            padding: 8px 8px 4px;
             font-weight: 600;
             background-color: rgba($color: #000000, $alpha: 0.8);
             margin-top: 8px;
             border-radius: 4px;
             & + .player {
                 margin-left: 8px;
+            }
+            display: flex;
+
+            .kick-button {
+                color: var(--text-1st-color);
+                background-color: transparent;
+                font-size: 10px;
+                margin-left: 4px;
+                align-self: flex-start;
+                transition: all 0.1s linear;
+
+                &:hover {
+                    color: var(--primary-color);
+                    transform: scale(1.2);
+                }
             }
         }
     }
@@ -605,12 +620,23 @@ $c: #00ffff #b100da;
 .podium {
     position: relative;
 
-    span {
+    span,
+    p {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
         font-size: 1vw;
         font-weight: 900;
+    }
+
+    span {
+        color: #ffe900;
+    }
+
+    p {
+        font-size: var(--text-h7) !important;
+        margin: 0;
+        font-weight: 400;
     }
 }
 
@@ -620,7 +646,11 @@ $c: #00ffff #b100da;
     }
     span {
         font-size: 1.5vw;
-        top: 43.5%;
+        top: 42%;
+    }
+    p {
+        top: 48.5%;
+        font-size: var(--text-h6) !important;
     }
     transform: translateY(-10%);
     margin: 0 1vw;
@@ -631,7 +661,10 @@ $c: #00ffff #b100da;
         width: 15vw;
     }
     span {
-        top: 50%;
+        top: 49%;
+    }
+    p {
+        top: 54%;
     }
 }
 
@@ -640,7 +673,10 @@ $c: #00ffff #b100da;
         width: 15vw;
     }
     span {
-        top: 50%;
+        top: 49%;
+    }
+    p {
+        top: 54%;
     }
 }
 
@@ -648,9 +684,27 @@ $c: #00ffff #b100da;
     position: absolute;
     top: 20px;
     font-size: 30px;
-    right: 0;
+    z-index: 10;
+
+    right: 20px;
     padding: 0;
     min-width: auto;
+    &:hover {
+        a {
+            color: rgba(238, 53, 41);
+        }
+    }
+}
+
+.navigate-logo {
+    z-index: 10;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+
+    img {
+        height: 90px;
+    }
 }
 
 .copy-button {
