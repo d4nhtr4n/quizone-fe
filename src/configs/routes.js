@@ -11,6 +11,7 @@ const routes = {
     create: "/create",
     host: "/host/:id",
     edit: "/edit/:id",
+    report: "/report/:id",
 };
 
 export default routes;

@@ -253,6 +253,15 @@ export default function MyQuizz() {
                                                             <Dropdown.Item
                                                                 onClick={() => {
                                                                     navigate(
+                                                                        `/report/${item._id}`
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Report
+                                                            </Dropdown.Item>
+                                                            <Dropdown.Item
+                                                                onClick={() => {
+                                                                    navigate(
                                                                         `/edit/${item._id}`
                                                                     );
                                                                 }}

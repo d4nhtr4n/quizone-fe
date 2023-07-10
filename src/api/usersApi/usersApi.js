@@ -52,6 +52,14 @@ const usersApi = {
         const url = `/library/getTheme?id=${id}`;
         return axiosClient(token).get(url, {});
     },
+    getReportList: (token, id) => {
+        const url = `/library/listReport?id=${id}`;
+        return axiosClient(token).get(url, {});
+    },
+    getReportDetail: (token, id) => {
+        const url = `/library/viewReport?id=${id}`;
+        return axiosClient(token).get(url, {});
+    },
     // forgotPassword: (email) => {
     //     const url = `/api/auth/forgotpassword`;
     //     return axiosClient().post(url, {
