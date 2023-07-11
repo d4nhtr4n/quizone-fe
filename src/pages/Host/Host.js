@@ -205,6 +205,16 @@ export default function Host() {
                 setFinalResults(data.result);
             }
         });
+
+        socketIo.on("host_start_res", (data) => {
+            console.log("host_start_res", data);
+            if (data && data.pin === pinCode) {
+                socketIo.emit("next_question_req", {
+                    counter: currentQuestionCount,
+                    pin: pinCode,
+                });
+            }
+        });
         socketIo.on("connect", onConnect);
         socketIo.on("disconnect", onDisconnect);
     }, [pinCode, socketIo]);
@@ -294,10 +304,6 @@ export default function Host() {
                                     primary
                                     onClick={() => {
                                         setWaitRoom(false);
-                                        socketIo.emit("next_question_req", {
-                                            counter: currentQuestionCount,
-                                            pin: pinCode,
-                                        });
                                         socketIo.emit("host_start", {
                                             pin: pinCode,
                                             mix: isMix,
